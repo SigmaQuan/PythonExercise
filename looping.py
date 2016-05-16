@@ -197,7 +197,8 @@
 #     non_sequences=output_model
 # )
 #
-# assign_values_at_positions = theano.function(inputs=[location, values, output_model], outputs=result)
+# assign_values_at_positions = theano.function(
+#   inputs=[location, values, output_model], outputs=result)
 #
 # # Test
 # test_locations = np.asarray([[1, 1], [2, 3]], dtype=np.int32)
