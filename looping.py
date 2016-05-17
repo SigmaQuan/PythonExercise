@@ -286,149 +286,150 @@
 # # updates dictionary to the function, then a.value will always be 2 and c
 # # will always be 12.
 
-# The second observation is that if we use shared variables (W, bvis, bhid)
-# but we do not iterate over them (i.e. scan does not really need to know
-# anything in particular about them, just that they are used inside the
-# function applied at each step) you do not need to pass them as arguments.
-# Scan Op calling any earlier (external) Op over and over. This results in
-# a simpler computational graph. However, passing them to the scan function
-# is a good practice, as it avoids Scan Op calling any earlier (external)
-# Op over and over. This results in a simpler computational graph, which
-# speeds up the optimization and the execution. *****To pass the shared
-# variables to Scan you need to put them in a list and give it to the
-# non_sequences argument. Here is the Gibbs sampling code updated:
-import numpy as np
-import theano
-from theano import tensor as T
-W_values = np.matrix('1 2; 3 4')
-print W_values
-W = theano.shared(W_values)
-print W
-
-bvis_values = 1
-bhid_valuds = 1
-bvis = theano.shared(bvis_values)
-bhid = theano.shared(bhid_valuds)
-
-trng = T.shared_randomstreams.RandomStreams(1234)
-
-
-# OneStep, with explicit use fo the shared variables (W, bvis, bhid)
-def OneStep(vsample, W, bvis, bhid):
-    hmean = T.nnet.sigmoid(theano.dot(vsample, W) + bhid)
-    hsample = trng.binomial(size=hmean.shape, n=1, p=hmean)
-    vmean = T.nnet.sigmoid(theano.dot(hsample, W.T) + bvis)
-    return trng.binomial(size=vsample.shape, n=1, p=vmean,
-                         dtype=theano.config.floatX)
-
-sample = theano.tensor.vector()
-
-# The new scan, with the shared variables passed as non_sequences
-values, updates = theano.scan(
-    fn=OneStep,
-    outputs_info=sample,
-    non_sequences=[W, bvis, bhid],
-    n_steps=10
-)
-
-gibbs10 = theano.function([sample], values[-1], updates=updates)
-# sample_value = theano.tensor.vector('1,2')
-# print(gibbs10(sample_value))
-
-# Using shared variables - the strict flag
-
-# As we just saw, passing the shared variables to scan many result in a
-# simpler computational graph, which speeds up the optimization and the
-# execution. A good way to remember to pass every shared variable used
-# during scan is to use the strict flag. When set to true, scan assumes
-# that all the necessary shared variables in fn are passed as a part of
-# non_sequences. This has to be ensured by the user. Otherwise, it will
-# result in an error.
-
-# Using the previous Gibbs sampling example:
-# The new scan, using strict=True
-values, updates =  theano.scan(
-    fn=OneStep,
-    outputs_info=sample,
-    non_sequences=[W, bvis, bhid],
-    strict=True
-)
-
-# If you omit to pass W, bvis or bhid, as a non_sequence, it will result in
-# an error.
-
-
-# Multiple outputs, several taps values - Recurrent Neural Network wth scan
-
-# The example above showed simple uses of scan. However, scan also supports
-# referring not only to the prior result and the current sequence value,
-# but also looking back more than one step.
 #
-# This is needed, for example, to implement a RNN using scan. Assume that
-# our RNN is defined as follows:
-# x_{n} = \tanh(
-#   Wx_{n-1}+
-#   W^{in}_{1}u_{n}+
-#   W^{in}_{2}u_{n-4}+
-#   W^{feedback}y_{n-1}
+# # The second observation is that if we use shared variables (W, bvis, bhid)
+# # but we do not iterate over them (i.e. scan does not really need to know
+# # anything in particular about them, just that they are used inside the
+# # function applied at each step) you do not need to pass them as arguments.
+# # Scan Op calling any earlier (external) Op over and over. This results in
+# # a simpler computational graph. However, passing them to the scan function
+# # is a good practice, as it avoids Scan Op calling any earlier (external)
+# # Op over and over. This results in a simpler computational graph, which
+# # speeds up the optimization and the execution. *****To pass the shared
+# # variables to Scan you need to put them in a list and give it to the
+# # non_sequences argument. Here is the Gibbs sampling code updated:
+# import numpy as np
+# import theano
+# from theano import tensor as T
+# W_values = np.matrix('1 2; 3 4')
+# print W_values
+# W = theano.shared(W_values)
+# print W
+#
+# bvis_values = 1
+# bhid_valuds = 1
+# bvis = theano.shared(bvis_values)
+# bhid = theano.shared(bhid_valuds)
+#
+# trng = T.shared_randomstreams.RandomStreams(1234)
+#
+#
+# # OneStep, with explicit use fo the shared variables (W, bvis, bhid)
+# def OneStep(vsample, W, bvis, bhid):
+#     hmean = T.nnet.sigmoid(theano.dot(vsample, W) + bhid)
+#     hsample = trng.binomial(size=hmean.shape, n=1, p=hmean)
+#     vmean = T.nnet.sigmoid(theano.dot(hsample, W.T) + bvis)
+#     return trng.binomial(size=vsample.shape, n=1, p=vmean,
+#                          dtype=theano.config.floatX)
+#
+# sample = theano.tensor.vector()
+#
+# # The new scan, with the shared variables passed as non_sequences
+# values, updates = theano.scan(
+#     fn=OneStep,
+#     outputs_info=sample,
+#     non_sequences=[W, bvis, bhid],
+#     n_steps=10
 # )
-# y_{n} = W^{out}x_{n-3}
-# Note that this network is far from a classical recurrent network and
-# might be useless. The reason  we defined as such is to better illustrate
-# the features of scan.
 #
-# In this case we have a sequence over which we need to iterate u, and two
-# outputs x and y. To implement this with scan we first construct a
-# function that computes one iteration step:
-def oneStep(u_tm4, u_t, x_tm3, x_tm1,
-            y_tm1, W, W_in_1, W_in_2, W_feedback, W_out):
-    x_t = T.tanh(
-        theano.dot(x_tm1, W) +
-        theano.dot(u_t, W_in_1) +
-        theano.dot(u_tm4, W_in_2) +
-        theano.dot(y_tm1, W_feedback)
-    )
-    y_t = theano.dot(x_tm3, W_out)
-    return [x_t, y_t]
-# As naming convention for the variables we used a _tmb to mean a at t-b
-# and a_tpb to be a at b+b. Note the order in which the parameter are
-# given, and in which the result is returned. Try to respect
-# chronological order among the taps (time slices of sequences or outputs)
-# used. For scan is crucial only for the variables representing the
-# different time taps to be in the same order as the one in which these
-# taps should respect an order, but also variables, since this is how scan
-# figures out what should be represented by what. Given that we have all
-# the Theano avriables needed we construct our RNN as follows:
-W = T.matrix()
-W_in_1 = T.matrix()
-W_in_2 = T.matrix()
-W_feedback = T.matrix()
-W_out = T.matrix()
-
-u = T.matrix()  # it is a sequence of vectors
-# initial state of x has to be a matrix, since it has to cover x[-3]
-x0 = T.matrix()
-# y0 is just a vector since scan has only to provide y[-1]
-y0 = T.vector()
-
-([x_vals, y_vals], updates) = theano.scan(
-    fn=oneStep,
-    sequences=dict(input=u, taps=[-4, -0]),
-    outputs_info=[dict(initial=x0, taps=[-3,-1]), y0],
-    non_sequences=[W, W_in_1, W_in_2, W_feedback, W_out],
-    strict=True
-)  # for second input y, scan adds -1 in output_taps by default
-
-# Now x_vals and y_vals are symbolic variables pointing to the sequence of
-# x and y values generated by iterating over u. The sequence_taps,
-# output_taps give to scan information about what slices are exactly
-# needed. Note that if we want to use x[t-k] we do not need to also have
-# x[t-(k-1)] x[t-(k-2)], ..., but when applying the compiled function, the
-# numpy array given to represent this sequence should be large enough to
-# cover this values. Assume that we compile the above function, and we give
-# as u the array uvals = [0,,1,2,3,4,5,6,7,8]. By abusing notations, scan
-# will consider uval[0] as u[-4], and will start scaning from uvals[4]
-# towards the end.
+# gibbs10 = theano.function([sample], values[-1], updates=updates)
+# # sample_value = theano.tensor.vector('1,2')
+# # print(gibbs10(sample_value))
+#
+# # Using shared variables - the strict flag
+#
+# # As we just saw, passing the shared variables to scan many result in a
+# # simpler computational graph, which speeds up the optimization and the
+# # execution. A good way to remember to pass every shared variable used
+# # during scan is to use the strict flag. When set to true, scan assumes
+# # that all the necessary shared variables in fn are passed as a part of
+# # non_sequences. This has to be ensured by the user. Otherwise, it will
+# # result in an error.
+#
+# # Using the previous Gibbs sampling example:
+# # The new scan, using strict=True
+# values, updates =  theano.scan(
+#     fn=OneStep,
+#     outputs_info=sample,
+#     non_sequences=[W, bvis, bhid],
+#     strict=True
+# )
+#
+# # If you omit to pass W, bvis or bhid, as a non_sequence, it will result in
+# # an error.
+#
+#
+# # Multiple outputs, several taps values - Recurrent Neural Network wth scan
+#
+# # The example above showed simple uses of scan. However, scan also supports
+# # referring not only to the prior result and the current sequence value,
+# # but also looking back more than one step.
+# #
+# # This is needed, for example, to implement a RNN using scan. Assume that
+# # our RNN is defined as follows:
+# # x_{n} = \tanh(
+# #   Wx_{n-1}+
+# #   W^{in}_{1}u_{n}+
+# #   W^{in}_{2}u_{n-4}+
+# #   W^{feedback}y_{n-1}
+# # )
+# # y_{n} = W^{out}x_{n-3}
+# # Note that this network is far from a classical recurrent network and
+# # might be useless. The reason  we defined as such is to better illustrate
+# # the features of scan.
+# #
+# # In this case we have a sequence over which we need to iterate u, and two
+# # outputs x and y. To implement this with scan we first construct a
+# # function that computes one iteration step:
+# def oneStep(u_tm4, u_t, x_tm3, x_tm1,
+#             y_tm1, W, W_in_1, W_in_2, W_feedback, W_out):
+#     x_t = T.tanh(
+#         theano.dot(x_tm1, W) +
+#         theano.dot(u_t, W_in_1) +
+#         theano.dot(u_tm4, W_in_2) +
+#         theano.dot(y_tm1, W_feedback)
+#     )
+#     y_t = theano.dot(x_tm3, W_out)
+#     return [x_t, y_t]
+# # As naming convention for the variables we used a _tmb to mean a at t-b
+# # and a_tpb to be a at b+b. Note the order in which the parameter are
+# # given, and in which the result is returned. Try to respect
+# # chronological order among the taps (time slices of sequences or outputs)
+# # used. For scan is crucial only for the variables representing the
+# # different time taps to be in the same order as the one in which these
+# # taps should respect an order, but also variables, since this is how scan
+# # figures out what should be represented by what. Given that we have all
+# # the Theano avriables needed we construct our RNN as follows:
+# W = T.matrix()
+# W_in_1 = T.matrix()
+# W_in_2 = T.matrix()
+# W_feedback = T.matrix()
+# W_out = T.matrix()
+#
+# u = T.matrix()  # it is a sequence of vectors
+# # initial state of x has to be a matrix, since it has to cover x[-3]
+# x0 = T.matrix()
+# # y0 is just a vector since scan has only to provide y[-1]
+# y0 = T.vector()
+#
+# ([x_vals, y_vals], updates) = theano.scan(
+#     fn=oneStep,
+#     sequences=dict(input=u, taps=[-4, -0]),
+#     outputs_info=[dict(initial=x0, taps=[-3,-1]), y0],
+#     non_sequences=[W, W_in_1, W_in_2, W_feedback, W_out],
+#     strict=True
+# )  # for second input y, scan adds -1 in output_taps by default
+#
+# # Now x_vals and y_vals are symbolic variables pointing to the sequence of
+# # x and y values generated by iterating over u. The sequence_taps,
+# # output_taps give to scan information about what slices are exactly
+# # needed. Note that if we want to use x[t-k] we do not need to also have
+# # x[t-(k-1)] x[t-(k-2)], ..., but when applying the compiled function, the
+# # numpy array given to represent this sequence should be large enough to
+# # cover this values. Assume that we compile the above function, and we give
+# # as u the array uvals = [0,,1,2,3,4,5,6,7,8]. By abusing notations, scan
+# # will consider uval[0] as u[-4], and will start scaning from uvals[4]
+# # towards the end.
 
 
 # Conditional ending of scan
@@ -439,12 +440,97 @@ y0 = T.vector()
 #
 # For an example, we will compute all powers of two smaller then some
 # provided value max_value.
+import theano
+import theano.tensor as T
 
+
+def power_of_2(previous_power, max_value):
+    return previous_power*2, theano.scan_module.until(
+            previous_power*2 > max_value)
+
+max_value = T.scalar()
+values, _ = theano.scan(
+    power_of_2,
+    outputs_info=T.constant(1.),
+    non_sequences=max_value,
+    n_steps=1024
+)
+
+f = theano.function([max_value], values)
+
+print(f(45))
+# [  2.   4.   8.  16.  32.  64.]
+
+# As you can see, in order to terminate on condition, the only thing
+# required is that the inner function power_of_2 to return also the
+# condition wrapped in the class theano.scan_module.until. The condition
+# has to be exptesssed in terms of the arguments of the inner function (in
+# this case previous_power and max_value).
+#
 
 # As a rule, scan always, expects the condition to be the last thing
-# returned by the inner function, otherwise an error will be raised..
-
-
-
-
-
+# returned by the inner function, otherwise an error will be raised.
+#
+# Optimizing Scan's performance
+#
+# This section covers some ways to improve performance of a Theano function
+# using Scan.
+#
+# Minimizing Scan usage
+#
+# Scan makes it possible to define simple and compact graphs that can do
+# same work as much larger and more complicated graphs. However, it comes
+# with a significant overhead. As such, when performance is the objective,
+# a good rule of thumb is to perform as much of the computation as
+# possible outside of Scan. This may have the effect of increasing memory
+# usage but can also reduce the overhead introduces by using Scan.
+#
+# Explicitly passing inputs of the inner function to scan
+#
+# It is possible, inside of Scan, to use variables previously defined
+# outside of Scan without explicitly passing them as inputs to the Scan.
+# However, it is often more efficient to explicitly pass them as
+# non-sequence inputs instead. Section Using shared variables-Gibbs
+# sampling provides an explanation for this and section Using shared
+# variables-the strict flag describes the strict flag, a tool that Scan
+# provides to help ensure that the inputs to the function inside Scan have
+# all been provided as explicit inputs to the scan() function.
+#
+#
+# Deativating garbage collecting in Scan
+#
+# Deactivating the garbage collection for Scan can allow it to reuse memory
+# between executions instead of always having to allocate new memory
+# between iterations of the same execution but frees the momory after the
+# last iteration.
+#
+# There are two ways to achieve this, using the Theano flag
+#   config.scan.allow_gc and setting it to False, or using the argument
+#   allow_gc of the function theano.scan() and set it to False (when a
+# value is not provided for this argument, the value of the flag
+# config.scan.allow_gc is used).
+#
+#
+# Graph optimizations
+#
+# This one is simple but still worth pointing out. Theano is able to auto-
+# matically recognize and optimize many computation patterns. However,
+# there are patterns that Theano doesn't optimize because doing so would
+# change the user interface (such as merging shared variable together into
+# a single one, for instance). Additionaly, Theano doesn't catch every case
+# that it could optimize and so it remains useful for performance that the
+# user defines and efficient graph in the first place. This is also the
+# case, and sometimes even more so, for the graph inside of Scan. This is
+# because it will be executed many times for every execution of the Theano
+# function that contain it.
+#
+# The LSTM tutorial on Deeplearning.net provides an example of an
+# optimization that Theano cannot perform. Instead of performing many
+# matrix multiplications between matrix x_{t} and each of the shared
+# matrix W_{i}, W_{c}, W_{f} and W_{o}, the matrices W_{*} are merged into
+# a single shared matrix W and the graph performs a single larger matrix
+# multiplication between W and x_{t}. The resulting matrix is then sliced
+# to obtain the results of the small individual matrix multiplications
+# would have produced. This optimization replaces several small and
+# inefficient matrix multiplications by a single larger one and thus
+# improves performance at the cost of a potentially higher memory usage.
