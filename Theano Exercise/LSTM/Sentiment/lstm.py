@@ -36,6 +36,22 @@ def get_mimibatches_idx(n, minibatch_size, shuffle=False):
     :param shuffle:
     :return:
     """
+    idx_list=numpy.arange(n, dtype='int32')
+    if shuffle:
+        numpy.random.shuffle(idx_list)
+
+    minibatchs =[]
+    minibatch_start = 0
+    for i in range(n//minibatch_size):  #//: Floor
+        minibatchs.append(
+            idx_list[minibatch_start: minibatch_start + minibatch_size])
+        minibatch_start += minibatch_size
+
+    # Make a minibatch out of what is left.
+    if(minibatch_start != n):
+        minibatchs.append(idx_list[minibatch_start:])
+
+    return zip(range(len(minibatchs)), minibatchs)
 
 
 def get_dataset(name):
@@ -45,22 +61,35 @@ def get_dataset(name):
 def zipp(params, tparams):
     """
     When the model are reload. Needed for the GPU stuff.
-    :param params:
-    :param tparams:
-    :return:
+    :param params: parameter of model.
+    :param tparams: make the parameter to zipp.
+    :return: none.
     """
+    for kk, vv in params.items():
+        tparams[kk].setvalue(vv)
 
 
 def unzip(zipped):
     """
     When pickle the model. Need for the GPU stuff.
     :param zipped:
-    :return:
+    :return: parameter of model.
     """
+    new_params = OrderedDict()
+    for kk, vv in zipped.items():
+        new_params[kk] = vv.get_value()
+    return new_params
 
 
 def dropout_layer(state_before, use_noise, trng):
-    proj = tensor.switch(
+    """
+    Dropout some nodes in a layer.
+    :param state_before: the state before dropout.
+    :param use_noise: the noise for..
+    :param trng: for producing binomial distribution.
+    :return: the switch vector.
+    """
+    projection = tensor.switch(
         use_noise,
         (state_before *
          trng.binomial(state_before.shape,
@@ -69,7 +98,7 @@ def dropout_layer(state_before, use_noise, trng):
                        dtype=state_before.dtype)),
         state_before*0.5
     )
-    return proj
+    return projection
 
 
 def _p(pp, name):
@@ -78,10 +107,23 @@ def _p(pp, name):
 
 def init_params(options):
     """
-    Global (not LSTM) parameter. For the embeding and the classifier.
+    Global (not LSTM) parameter. For the embedding and the classifier.
     :param options:
     :return:
     """
+    params = OrderedDict()
+    # embedding
+    randn = numpy.random.rand(options['n_word'], options['dim_proj'])
+    params['Wemb'] = (0.01 * randn).astype(config.floatX)
+    params = get_layer(options['encoder'])[0](
+        options, params, prefix=options['encoder'])
+
+    # classifier
+    params['U'] = 0.01 * numpy.random.randn(
+        options['dim_proj'], options['ydim']).astype(config.floatX)
+    params['b'] = numpy.zeros((options['ydim'],)).astype(config.floatX)
+
+    return params
 
 
 def load_params(path, params):
