@@ -54,7 +54,22 @@ def zipp(params, tparams):
 
 def unzip(zipped):
     """
-    When pickle
+    When pickle the model. Need for the GPU stuff.
     :param zipped:
     :return:
     """
+
+
+def dropout_layer(state_before, use_noise, trng):
+    proj = tensor.switch(
+        use_noise,
+            (state_before *
+             trng.binomial(state_before.shape,
+                           p=0.5,
+                           n=1,
+                           dtype=state_before.dtype)),
+        state_before*0.5
+    )
+    return proj
+
+
