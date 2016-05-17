@@ -72,3 +72,151 @@ def dropout_layer(state_before, use_noise, trng):
     return proj
 
 
+def _p(pp, name):
+    return '%s_%s' % (pp, name)
+
+
+def init_params(options):
+    """
+    Global (not LSTM) parameter. For the embeding and the classifier.
+    :param options:
+    :return:
+    """
+
+
+def load_params(path, params):
+
+
+def init_tparams(params):
+
+
+def get_layer(name):
+
+
+def ortho_weigh(ndim):
+
+
+def parma_init_lstm(options, params, prefix='lstm'):
+
+
+def lstm_layer(tparams, state_below, options, prefix='lstm', mask=None):
+
+
+# ff: Feed Forward (normal neural net), only useful to put after lstm
+#     before the classifier.
+layers={'lstm': (param_init_lstm, lstm_layer)}
+
+
+def sgd(lr, tparams, grads, x, mask, y, cost):
+    """
+    Stochastic Gradient Descent
+    note: A more complicated of sgd then needed. This is done like that for
+    adadelta and rmsprop.
+    :param lr:
+    :param tparams:
+    :param grads:
+    :param x:
+    :param mask:
+    :param y:
+    :param cost:
+    :return:
+    """
+
+
+def adadelta(lr, tparams, grads, x, mask, y, cost):
+    """
+    An adaptive learning rate optimizer.
+    :param lr: Theano SharedVariable, initial learning rate.
+    :param tparams: Theano SharedVariable, model parameters.
+    :param grads: Theano variable, gradients of cost w.r.t. parameters.
+    :param x: Theano variable, model inputs.
+    :param mask: Theano variable, sequence mask.
+    :param y: Theano variable, targets.
+    :param cost: Theano variable, objective function to minimize.
+    :return:
+    Notes: for more information, see Matthew D. Zeiler, ADADELTA: An
+        adaptive learning rate method, arXiv:1212.5601.
+    """
+
+
+def rmsprop(lr, tparams, grads, x, mask, y, cost):
+    """
+    A variant of SGD that scales the step size by running average of the
+    recent step norms.
+    :param lr: Theano SharedVariable, initial learning rate.
+    :param tparams: Theano SharedVariable, model parameters.
+    :param grads: Theano variable, gradients of cost w.r.t to parameters.
+    :param x: Theano varaible, model inputs.
+    :param mask: Theano variable, sequence mask.
+    :param y: Theano variable, targets.
+    :param cost: Theano variable, objective function to minimize.
+    :return:
+    Note: for more information, see Geoff Hinton, Neural networks for
+        machine learning, lecture 6a,
+        htttp://cs.toronto.edu/~tijmen/csc321/sildes/lecture_slides_lec5.pdf
+    """
+
+
+def build_model(tparams, options):
+
+
+def pred_probs(f_pred_prob, prepare_data, data, iterator, verbose=False):
+    """
+    If you want to to use a trained model, this is useful to compute the
+    probablilities of new examples.
+    :param f_pred_prob:
+    :param prepare_data:
+    :param data:
+    :param iterator:
+    :param verbose:
+    :return:
+    """
+
+
+def pred_error(f_pred, prepare_data, data, iterator, verbose=False):
+
+
+def train_lstm(
+        dim_proj=128, patience=10, max_epochs=5000, dispFreq=10,
+        decay_c=0., lrate=0.0001, n_words=10000, optimizer=adadelta,
+        encoder='lstm', saveto='lstm_model.npz', validFreq=370,
+        saveFreq=1110, maxlen=100, batch_size=16, valid_batch_size=64,
+        dataset='imdb',
+        # Parameters for extra option
+        noise_std=0., use_dropout=True, reload_model=None, test_size=-1):
+    """
+    Training LSTM.
+    :param dim_proj: word embeding dimension and  LSTM number of hidden
+        units.
+    :param patience: number of each to wait before early stop if no
+        progress.
+    :param max_epochs: the maximum number of epoch to run.
+    :param dispFreq:display to stdout the training progress every N
+        updates.
+    :param decay_c: weight decay for the classifier applied to the U
+        weights.
+    :param lrate: learning rate for sgd (not used for adadelta and rmsprop)
+    :param n_words: vocabulary size.
+    :param optimizer: sgd, adadelt and rmsprop variable, sgd very hard to
+        use, not recommended (probably need momentum and decaying learning
+        rate).
+    :param encoder: TODO: can be removed must be lstm.
+    :param saveto: the best model will be saved there.
+    :param validFreq: compute teh validation error after this number of
+        update.
+    :param saveFreq: save the parameters after every saveFreq updates.
+    :param maxlen: sequence longer than this get ignored.
+    :param batch_size: the batch size during training.
+    :param valid_batch_size: the batch size during validation/test set.
+    :param dataset: data file name.
+    :param noise_std: the standard deviation of noise.
+    :param use_dropout:if False slightly faster, but worst test error.
+        This frequently need a bigger model.
+    :param reload_model: path to a saved model we want to start from.
+    :param test_size: if > 0, we keep only this number of test example.
+    :return:
+    """
+
+if __name__=='__main__':
+    # See function train for all possible parameter and there definition.
+    train_lstm(max_epochs=100, test_size=500)
