@@ -127,21 +127,106 @@ def init_params(options):
 
 
 def load_params(path, params):
+    pp = numpy.load(path)
+    for kk, vv in params.items():
+        if kk not in pp:
+            raise Warning('%s is not in the archive' % kk)
+        params[kk] = pp[kk]
 
 
 def init_tparams(params):
+    tparams = OrderedDict()
+    for kk, pp in params.items():
+        tparams[kk] = theano.shared(params[kk], name=kk)
+    return tparams
 
 
 def get_layer(name):
+    fns = layers[name]
+    return fns
 
 
 def ortho_weigh(ndim):
+    W = numpy.random.randn(ndim, ndim)
+    u, s, v = numpy.linalg.svd(W)
+    return u.astype(config.floatX)
 
 
 def parma_init_lstm(options, params, prefix='lstm'):
+    """
+    Initial the LSTM parameter.
+    :param options:
+    :param params:
+    :param prefix:
+    :return:
+    """
+    W = numpy.concatenate(
+        [ortho_weigh(options['dim_proj']),
+         ortho_weigh(options['dim_proj']),
+         ortho_weigh(options['dim_proj']),
+         ortho_weigh(options['dim_proj'])],
+        axis=1
+    )
+    params[_p(prefix, 'W')] = W
+    U = numpy.concatenate(
+        [ortho_weigh(options['dim_proj']),
+         ortho_weigh(options['dim_proj']),
+         ortho_weigh(options['dim_proj']),
+         ortho_weigh(options['dim_proj'])],
+        axis=1
+    )
+    params[_p(prefix, 'U')] = U
+    b = numpy.zeros((4*options['dim_proj'],))
+    params[_p(prefix, 'b')] = b.astype(config.floatX)
+
+    return params
 
 
 def lstm_layer(tparams, state_below, options, prefix='lstm', mask=None):
+    nsteps = state_below.shape[0]
+    if state_below.ndim == 3:
+        n_samples = state_below.shape[1]
+    else:
+        n_samples = 1
+
+    assert mask is not None
+
+    def _slice(_x, n, dim):
+        if _x.ndim == 3:
+            return _x[:, :, n*dim]
+        return  _x[:, n*dim:(n+1)*dim]
+
+    def _step(m_, x_, h_, c_):  #??
+        preact = tensor.dot(h_, tparams[_p(prefix, 'U')])
+        preact += x_
+
+        i = tensor.nnet.sigmoid(_slice(preact, 0, options['dim_proj']))
+        f = tensor.nnet.sigmoid(_slice(preact, 1, options['dim_proj']))
+        o = tensor.nnet.sigmoid(_slice(preact, 2, options['dim_proj']))
+        c = tensor.tanh(_slice(preact, 3, options['dim_proj']))
+
+        c = f*c_ + i*c
+        c = m_[:, None]*c + (1.-m_)[:, None]*c_
+
+        h = o*tensor.tanh(c)
+        h = m_[:, None]*h + (1.-m_)[:, None]*h_
+
+        return h, c
+
+    state_below = (tensor.dot(state_below, tparams[_p(prefx, 'W')])+
+                   tparams[_p(prefix, 'b')])
+
+    dim_proj = options['dim_proj']
+    rval, upates =  theano.scan(
+        _step,
+        sequences=[mask, state_below],
+        outputs_info=[tensor.alloc(numpy_floatX(0.), n_samples, dim_proj),
+                      tensor.alloc(numpy_floatX(0.), n_samples, dim_proj)],
+        name=_p(prefix, '_layers'),
+        n_steps=nsteps
+    )
+
+    return rval[0]
 
 
 # ff: Feed Forward (normal neural net), only useful to put after lstm
@@ -154,15 +239,31 @@ def sgd(lr, tparams, grads, x, mask, y, cost):
     Stochastic Gradient Descent
     note: A more complicated of sgd then needed. This is done like that for
     adadelta and rmsprop.
-    :param lr:
-    :param tparams:
-    :param grads:
-    :param x:
-    :param mask:
-    :param y:
-    :param cost:
+    :param lr: Theano SharedVaraible, learning rate.
+    :param tparams: Theano SharedVaraible, model parameters.
+    :param grads: Theano variable, gradient of cost w.r.t. parameters.
+    :param x: Theano variable, sequence mask.
+    :param mask: Theano variable, sequence mask.
+    :param y: Theano variable, targets.
+    :param cost: Theano variable, objective function to minimize.
     :return:
     """
+    # New set of shared variable that will contain the gradient for a
+    # mini-batch.
+    gshared = [theano.shared(p.get_value()*0., name='%s_grad'%k)
+               for k, p in tparams.items()]
+    gsup = [(gs,g) for gs, g in zip(gshared, grads)]
+
+    # Function that computes gradients for a mini-batch, but do not updates
+    # the weights.
+    f_grd_shared = theano.function([x, mask, y], cost, updates=gsup,
+                                   name = 'sgd_f_grad_shared')
+
+    pup = [(p, p-lr*g) for p, g in zip(tparams.values(), gshared)]
+
+    # Function that update the weights from the previously computed
+    # gradient.
+    
 
 
 def adadelta(lr, tparams, grads, x, mask, y, cost):
