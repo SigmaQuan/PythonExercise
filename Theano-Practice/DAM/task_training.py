@@ -165,10 +165,6 @@ class TrainOneTask:
                 plt.xlabel('epoch')
                 plt.ylabel('accuracy')
                 plt.legend(loc=4)
-                print self.args.babi_id
-                print epoch
-                print np.max(train_acc)
-                print np.max(test_acc)
                 self.network_name = 'task_%s.epoch_%03d.train_%06.3f.test_%06.3f' % (
                     self.args.babi_id, epoch, np.max(train_acc), np.max(test_acc))
                 plt.title(self.network_name)
@@ -194,6 +190,11 @@ class TrainOneTask:
                             np.std(test_acc[len(test_acc) - 30: len(test_acc) - 1]) < 0.5):
                     print "==> parallel"
                     break
+
+            print ('babi task id: %2d' % self.args.babi_id)
+            print ('epoch: %2d' % len(epochs))
+            print ('training acc.: %f' % np.max(train_acc))
+            print ('testing acc.: %f' % np.max(test_acc))
 
             state_name = '%s/%s.state'%(self.folder_name, self.network_name)
             print "==> saving ... %s" % state_name

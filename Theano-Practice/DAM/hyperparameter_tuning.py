@@ -33,8 +33,8 @@ for i in range(0, 20, 1):
     print "Training task %d..." % i
     start_time = time.time()
     sys_stdout = sys.stdout
-    log_file = '%s/task_%02d.log' % (folder_name, i)
-    sys.stdout = open(log_file,'a')
+    log_file = '%s/task_%02d.log' % (folder_name, i+1)
+    sys.stdout = open(log_file, 'a')
     print "Training task %d..." % i
     print arg_list[i]
     train_one_task = TrainOneTask(arg_list[i], word2vec)
