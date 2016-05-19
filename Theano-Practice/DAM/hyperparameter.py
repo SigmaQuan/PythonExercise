@@ -4,6 +4,7 @@ import argparse
 class HyperParameterSpace:
     def __init__(self):
         self.network = ["dmn_batch", "dmn_basic", "dmn_smooth", "dmn_qa"]
+        self.weight_init = ["uniform", "Gaussian"]
         self.word_vector_size = [50, 100, 200, 300]
         self.dim = [40, 80, 160, 320]
         self.epochs = [100, 150, 200, 300, 500]
@@ -109,6 +110,8 @@ class HyperParameterSpace:
         #                     help='batch normalization')
         # parser.set_defaults(shuffle=self.shuffle)
         parser = argparse.ArgumentParser()
+        parser.add_argument('--weight_init', type=str, default="uniform",
+                            help='way to initialize weight: uniform, Gaussian')
         parser.add_argument('--network', type=str, default="dmn_batch",
                             help='network type: dmn_basic, dmn_smooth, or dmn_batch')
         parser.add_argument('--word_vector_size', type=int, default=50,
