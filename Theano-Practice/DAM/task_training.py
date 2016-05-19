@@ -203,6 +203,7 @@ class TrainOneTask:
             pp = PdfPages(imageName)
             plt.savefig(pp, format='pdf')
             pp.close()
+            plt.close()
 
         elif self.args.mode == 'test':
             file = open('last_tested_model.json', 'w+')
