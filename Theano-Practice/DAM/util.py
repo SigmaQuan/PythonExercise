@@ -22,6 +22,10 @@ def normal_param(std=0.1, mean=0.0, shape=(0,)):
     return theano.shared(lasagne.init.Normal(std, mean).sample(shape), borrow=True)
 
 
+def uniform_param(std=0.1, mean=0.0, shape=(0,)):
+    return theano.shared(lasagne.init.Uniform(std, mean).sample(shape), borrow=True)
+
+
 def get_norm(x):
     x = np.array(x)
     return np.sum(x * x)
