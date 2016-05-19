@@ -57,29 +57,29 @@ class DAM:
         self.input_mask_var = T.imatrix('input_mask_var') # (batch_size, indices)
 
         print "==> building input module"
-        # self.W_inp_res_in = util.normal_param(std=0.1, shape=(self.dim, self.word_vector_size))
-        # self.W_inp_res_hid = util.normal_param(std=0.1, shape=(self.dim, self.dim))
-        # self.b_inp_res = util.constant_param(value=0.0, shape=(self.dim,))
-        #
-        # self.W_inp_upd_in = util.normal_param(std=0.1, shape=(self.dim, self.word_vector_size))
-        # self.W_inp_upd_hid = util.normal_param(std=0.1, shape=(self.dim, self.dim))
-        # self.b_inp_upd = util.constant_param(value=0.0, shape=(self.dim,))
-        #
-        # self.W_inp_hid_in = util.normal_param(std=0.1, shape=(self.dim, self.word_vector_size))
-        # self.W_inp_hid_hid = util.normal_param(std=0.1, shape=(self.dim, self.dim))
-        # self.b_inp_hid = util.constant_param(value=0.0, shape=(self.dim,))
-
-        self.W_inp_res_in = util.uniform_param(std=0.1, shape=(self.dim, self.word_vector_size))
-        self.W_inp_res_hid = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
+        self.W_inp_res_in = util.normal_param(std=0.1, shape=(self.dim, self.word_vector_size))
+        self.W_inp_res_hid = util.normal_param(std=0.1, shape=(self.dim, self.dim))
         self.b_inp_res = util.constant_param(value=0.0, shape=(self.dim,))
 
-        self.W_inp_upd_in = util.uniform_param(std=0.1, shape=(self.dim, self.word_vector_size))
-        self.W_inp_upd_hid = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
+        self.W_inp_upd_in = util.normal_param(std=0.1, shape=(self.dim, self.word_vector_size))
+        self.W_inp_upd_hid = util.normal_param(std=0.1, shape=(self.dim, self.dim))
         self.b_inp_upd = util.constant_param(value=0.0, shape=(self.dim,))
 
-        self.W_inp_hid_in = util.uniform_param(std=0.1, shape=(self.dim, self.word_vector_size))
-        self.W_inp_hid_hid = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
+        self.W_inp_hid_in = util.normal_param(std=0.1, shape=(self.dim, self.word_vector_size))
+        self.W_inp_hid_hid = util.normal_param(std=0.1, shape=(self.dim, self.dim))
         self.b_inp_hid = util.constant_param(value=0.0, shape=(self.dim,))
+
+        # self.W_inp_res_in = util.uniform_param(std=0.1, shape=(self.dim, self.word_vector_size))
+        # self.W_inp_res_hid = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
+        # self.b_inp_res = util.constant_param(value=0.0, shape=(self.dim,))
+        #
+        # self.W_inp_upd_in = util.uniform_param(std=0.1, shape=(self.dim, self.word_vector_size))
+        # self.W_inp_upd_hid = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
+        # self.b_inp_upd = util.constant_param(value=0.0, shape=(self.dim,))
+        #
+        # self.W_inp_hid_in = util.uniform_param(std=0.1, shape=(self.dim, self.word_vector_size))
+        # self.W_inp_hid_hid = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
+        # self.b_inp_hid = util.constant_param(value=0.0, shape=(self.dim,))
 
         input_var_shuffled = self.input_var.dimshuffle(1, 2, 0)
         inp_dummy = theano.shared(np.zeros((self.dim, self.batch_size), dtype=floatX))
@@ -107,43 +107,43 @@ class DAM:
         self.q_q = q_q_history[-1]
 
         print "==> creating parameters for memory module"
-        # self.W_mem_res_in = util.normal_param(std=0.1, shape=(self.dim, self.dim))
-        # self.W_mem_res_hid = util.normal_param(std=0.1, shape=(self.dim, self.dim))
-        # self.b_mem_res = util.constant_param(value=0.0, shape=(self.dim,))
-        #
-        # self.W_mem_upd_in = util.normal_param(std=0.1, shape=(self.dim, self.dim))
-        # self.W_mem_upd_hid = util.normal_param(std=0.1, shape=(self.dim, self.dim))
-        # self.b_mem_upd = util.constant_param(value=0.0, shape=(self.dim,))
-        #
-        # self.W_mem_hid_in = util.normal_param(std=0.1, shape=(self.dim, self.dim))
-        # self.W_mem_hid_hid = util.normal_param(std=0.1, shape=(self.dim, self.dim))
-        # self.b_mem_hid = util.constant_param(value=0.0, shape=(self.dim,))
-        #
-        # self.W_b = util.normal_param(std=0.1, shape=(self.dim, self.dim))
-        # self.W_1 = util.normal_param(std=0.1, shape=(self.dim, 7 * self.dim + 0))
-        # # self.W_1 = util.normal_param(std=0.1, shape=(self.dim, 7 * self.dim + 2))
-        # self.W_2 = util.normal_param(std=0.1, shape=(1, self.dim))
-        # self.b_1 = util.constant_param(value=0.0, shape=(self.dim,))
-        # self.b_2 = util.constant_param(value=0.0, shape=(1,))
-
-        self.W_mem_res_in = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
-        self.W_mem_res_hid = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
+        self.W_mem_res_in = util.normal_param(std=0.1, shape=(self.dim, self.dim))
+        self.W_mem_res_hid = util.normal_param(std=0.1, shape=(self.dim, self.dim))
         self.b_mem_res = util.constant_param(value=0.0, shape=(self.dim,))
 
-        self.W_mem_upd_in = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
-        self.W_mem_upd_hid = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
+        self.W_mem_upd_in = util.normal_param(std=0.1, shape=(self.dim, self.dim))
+        self.W_mem_upd_hid = util.normal_param(std=0.1, shape=(self.dim, self.dim))
         self.b_mem_upd = util.constant_param(value=0.0, shape=(self.dim,))
 
-        self.W_mem_hid_in = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
-        self.W_mem_hid_hid = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
+        self.W_mem_hid_in = util.normal_param(std=0.1, shape=(self.dim, self.dim))
+        self.W_mem_hid_hid = util.normal_param(std=0.1, shape=(self.dim, self.dim))
         self.b_mem_hid = util.constant_param(value=0.0, shape=(self.dim,))
 
-        self.W_b = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
-        self.W_1 = util.uniform_param(std=0.1, shape=(self.dim, 7 * self.dim + 0))
-        # self.W_1 = util.uniform_param(std=0.1, shape=(self.dim, 7 * self.dim + 2))
-        self.W_2 = util.uniform_param(std=0.1, shape=(1, self.dim))
+        self.W_b = util.normal_param(std=0.1, shape=(self.dim, self.dim))
+        self.W_1 = util.normal_param(std=0.1, shape=(self.dim, 7 * self.dim + 0))
+        # self.W_1 = util.normal_param(std=0.1, shape=(self.dim, 7 * self.dim + 2))
+        self.W_2 = util.normal_param(std=0.1, shape=(1, self.dim))
         self.b_1 = util.constant_param(value=0.0, shape=(self.dim,))
         self.b_2 = util.constant_param(value=0.0, shape=(1,))
+        #
+        # self.W_mem_res_in = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
+        # self.W_mem_res_hid = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
+        # self.b_mem_res = util.constant_param(value=0.0, shape=(self.dim,))
+        #
+        # self.W_mem_upd_in = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
+        # self.W_mem_upd_hid = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
+        # self.b_mem_upd = util.constant_param(value=0.0, shape=(self.dim,))
+        #
+        # self.W_mem_hid_in = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
+        # self.W_mem_hid_hid = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
+        # self.b_mem_hid = util.constant_param(value=0.0, shape=(self.dim,))
+        #
+        # self.W_b = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
+        # self.W_1 = util.uniform_param(std=0.1, shape=(self.dim, 7 * self.dim + 0))
+        # # self.W_1 = util.uniform_param(std=0.1, shape=(self.dim, 7 * self.dim + 2))
+        # self.W_2 = util.uniform_param(std=0.1, shape=(1, self.dim))
+        # self.b_1 = util.constant_param(value=0.0, shape=(self.dim,))
+        # self.b_2 = util.constant_param(value=0.0, shape=(1,))
 
 
         print "==> building episodic memory module (fixed number of steps: %d)" % self.memory_hops
@@ -172,29 +172,29 @@ class DAM:
             self.prediction = util.softmax(T.dot(self.W_a, last_mem))
 
         elif self.answer_module == 'recurrent':
-            # self.W_ans_res_in = util.normal_param(std=0.1, shape=(self.dim, self.dim + self.vocab_size))
-            # self.W_ans_res_hid = util.normal_param(std=0.1, shape=(self.dim, self.dim))
-            # self.b_ans_res = util.constant_param(value=0.0, shape=(self.dim,))
-            #
-            # self.W_ans_upd_in = util.normal_param(std=0.1, shape=(self.dim, self.dim + self.vocab_size))
-            # self.W_ans_upd_hid = util.normal_param(std=0.1, shape=(self.dim, self.dim))
-            # self.b_ans_upd = util.constant_param(value=0.0, shape=(self.dim,))
-            #
-            # self.W_ans_hid_in = util.normal_param(std=0.1, shape=(self.dim, self.dim + self.vocab_size))
-            # self.W_ans_hid_hid = util.normal_param(std=0.1, shape=(self.dim, self.dim))
-            # self.b_ans_hid = util.constant_param(value=0.0, shape=(self.dim,))
-
-            self.W_ans_res_in = util.uniform_param(std=0.1, shape=(self.dim, self.dim + self.vocab_size))
-            self.W_ans_res_hid = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
+            self.W_ans_res_in = util.normal_param(std=0.1, shape=(self.dim, self.dim + self.vocab_size))
+            self.W_ans_res_hid = util.normal_param(std=0.1, shape=(self.dim, self.dim))
             self.b_ans_res = util.constant_param(value=0.0, shape=(self.dim,))
 
-            self.W_ans_upd_in = util.uniform_param(std=0.1, shape=(self.dim, self.dim + self.vocab_size))
-            self.W_ans_upd_hid = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
+            self.W_ans_upd_in = util.normal_param(std=0.1, shape=(self.dim, self.dim + self.vocab_size))
+            self.W_ans_upd_hid = util.normal_param(std=0.1, shape=(self.dim, self.dim))
             self.b_ans_upd = util.constant_param(value=0.0, shape=(self.dim,))
 
-            self.W_ans_hid_in = util.uniform_param(std=0.1, shape=(self.dim, self.dim + self.vocab_size))
-            self.W_ans_hid_hid = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
+            self.W_ans_hid_in = util.normal_param(std=0.1, shape=(self.dim, self.dim + self.vocab_size))
+            self.W_ans_hid_hid = util.normal_param(std=0.1, shape=(self.dim, self.dim))
             self.b_ans_hid = util.constant_param(value=0.0, shape=(self.dim,))
+
+            # self.W_ans_res_in = util.uniform_param(std=0.1, shape=(self.dim, self.dim + self.vocab_size))
+            # self.W_ans_res_hid = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
+            # self.b_ans_res = util.constant_param(value=0.0, shape=(self.dim,))
+            #
+            # self.W_ans_upd_in = util.uniform_param(std=0.1, shape=(self.dim, self.dim + self.vocab_size))
+            # self.W_ans_upd_hid = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
+            # self.b_ans_upd = util.constant_param(value=0.0, shape=(self.dim,))
+            #
+            # self.W_ans_hid_in = util.uniform_param(std=0.1, shape=(self.dim, self.dim + self.vocab_size))
+            # self.W_ans_hid_hid = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
+            # self.b_ans_hid = util.constant_param(value=0.0, shape=(self.dim,))
 
             def answer_step(prev_a, prev_y):
                 a = self.GRU_update(prev_a, T.concatenate([prev_y, self.q_q]),
