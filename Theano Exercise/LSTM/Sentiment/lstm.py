@@ -263,7 +263,7 @@ def sgd(lr, tparams, grads, x, mask, y, cost):
 
     # Function that update the weights from the previously computed
     # gradient.
-    
+
 
 
 def adadelta(lr, tparams, grads, x, mask, y, cost):
