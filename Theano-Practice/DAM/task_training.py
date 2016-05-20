@@ -154,6 +154,10 @@ class TrainOneTask:
 
                 print "epoch %d took %.3fs" % (epoch, float(time.time()) - start_time)
 
+                # print "show weight matrix"
+                # self.dam.show_weight()
+                self.dam.print_input_module()
+
                 # train_error.append(training_loss)
                 # test_error.append(test_loss)
                 train_acc.append(training_acc)
