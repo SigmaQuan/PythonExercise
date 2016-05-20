@@ -32,6 +32,7 @@ class TrainOneTask:
     def set_folder_name(self, folder_name):
         self.folder_name = folder_name
 
+
     # set network name
     def set_network_name(self):
         return self.args.prefix + '%s.mh%d.n%d.bs%d%s%s%s.babi%s' % (
@@ -69,6 +70,7 @@ class TrainOneTask:
         #     return dmn_qa_draft.DMN_qa(**self.args_dict)
         else:
             raise Exception("No such network known: " + self.args.network)
+
 
     def do_epoch(self, mode, epoch, skipped=0):
         y_true = []

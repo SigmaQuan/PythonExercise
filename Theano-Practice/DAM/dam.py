@@ -487,6 +487,7 @@ class DAM:
         random.shuffle(combined)
         self.train_input, self.train_q, self.train_answer, self.train_fact_count, self.train_input_mask = zip(*combined)
 
+
     def print_input_module(self):
         print(self.W_inp_res_in.get_value())
         print(self.W_inp_res_hid.get_value())
