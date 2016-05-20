@@ -33,8 +33,8 @@ print "==> testing each task.."
 folder_name = time.strftime('experiment/test-%Y-%m-%d %H:%M:%S')
 os.makedirs(folder_name)
 # print acc_delta
-for i in range(0, 20, 1):
-    print "Training task %d..." % i
+for i in range(0, 1, 1):
+    print "Testing task %d..." % i
     start_time = time.time()
     sys_stdout = sys.stdout
     log_file = '%s/task_%02d.log' % (folder_name, i+1)
