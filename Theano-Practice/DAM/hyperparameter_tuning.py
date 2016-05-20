@@ -29,7 +29,7 @@ acc_delta = [99.9, 99.9, 99.9, 99.9, 99.5,
 folder_name = time.strftime('experiment/%Y-%m-%d %H:%M:%S')
 os.makedirs(folder_name)
 # print acc_delta
-for i in range(0, 20, 1):
+for i in range(9, 20, 1):
     print "Training task %d..." % i
     start_time = time.time()
     sys_stdout = sys.stdout
