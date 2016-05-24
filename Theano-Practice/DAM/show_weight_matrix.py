@@ -1,9 +1,6 @@
-<<<<<<< HEAD
 """
 contourf.
 """
-import matplotlib.pyplot as plt
-=======
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -42,4 +39,3 @@ plt.colorbar()
 
 # plt.colorbar()
 plt.show()
->>>>>>> origin/master
