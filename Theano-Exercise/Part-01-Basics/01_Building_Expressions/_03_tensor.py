@@ -1,4 +1,4 @@
-# Fill in the TODOs in this exercise, then run python _09_tensor.py to see
+# Fill in the TODOs in this exercise, then run python _03_tensor.py to see
 # if your solution works!
 import numpy as np
 from theano import function
@@ -43,8 +43,8 @@ def partial_max(a):
     :param a:
     :return: a theano matrix
     """
-    # return tensor.max(a, axis=[1, 2])
-    return a.max(axis=(1, 2))
+    return tensor.max(a, axis=[1, 2])
+    # return a.max(axis=(1, 2))
     # raise NotImplementatedError("TODO: implement this function")
 
 
@@ -65,4 +65,4 @@ if __name__ == "__main__":
     actual = f(a_value, b_value)
 
     assert np.allclose(actual, expected), (actual, expected)
-    print "SUCCESS!"
+    print("SUCCESS!")
