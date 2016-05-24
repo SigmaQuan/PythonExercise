@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
 
-class TrainOneTask:
+class TestOneTask:
     def __init__(self, arg, word_vector):
         self.args = arg
         self.word2vec = word_vector
@@ -122,105 +122,12 @@ class TrainOneTask:
 
         return accuracy, avg_loss, skipped
 
-
-    def train(self, acc_delta):
-        fig = plt.figure()
-        plt.axis([0, 10, 0, 1])
-        plt.ion()
-
-        if self.args.mode == 'train':
-            print "==> training"
-            skipped = 0
-            # train_error = []
-            # test_error = []
-            train_acc = []
-            test_acc = []
-            epochs = []
-            need_break = 0
-            for epoch in range(self.args.epochs):
-                start_time = time.time()
-
-                if self.args.shuffle:
-                    self.dam.shuffle_train_set()
-
-                training_acc, training_loss, skipped = self.do_epoch('train', epoch, skipped)
-                testing_acc, test_loss, skipped = self.do_epoch('test', epoch, skipped)
-                # training_acc = np.random.randn()
-                # testing_acc = np.random.randn()
-
-                # state_name = 'states/%s.epoch%d.test%.5f.state' % (self.network_name, epoch, test_loss)
-                #
-                # if (epoch % self.args.save_every == 0):
-                #     print "==> saving ... %s" % state_name
-                #     self.dmn.save_params(state_name, epoch)
-
-                print "epoch %d took %.3fs" % (epoch, float(time.time()) - start_time)
-
-                # print "show weight matrix"
-                # self.dam.show_weight()
-                self.dam.print_input_module()
-
-                # train_error.append(training_loss)
-                # test_error.append(test_loss)
-                train_acc.append(training_acc)
-                test_acc.append(testing_acc)
-                epochs.append(epoch)
-                plt.gca().cla()
-                plt.plot(epochs, train_acc, 'r.-', label="Train")
-                plt.plot(epochs, test_acc, 'g.-', label="Test")
-                plt.xlabel('epoch')
-                plt.ylabel('accuracy')
-                plt.legend(loc=4)
-                self.network_name = 'task_%s.epoch_%03d.train_%06.3f.test_%06.3f' % (
-                    self.args.babi_id, epoch, np.max(train_acc), np.max(test_acc))
-                plt.title(self.network_name)
-                plt.draw()
-                plt.grid(True)
-                plt.pause(0.05)
-
-                if (training_acc > acc_delta and testing_acc > acc_delta):
-                    need_break = need_break + 1
-
-                if need_break > 10:
-                    print "==> need_break > 10"
-                    break
-
-                if (training_acc > 95.0 and testing_acc < 47.5 and
-                            test_acc[len(test_acc) - 1] < test_acc[len(test_acc) - 2]):
-                    print "==> training_acc > %.5f and testing_acc < %.5f and test_acc[n] %.5f < test_acc[n-1]%.5f" % (
-                        training_acc, testing_acc, test_acc[len(test_acc) - 1], test_acc[len(test_acc) - 2])
-                    break
-
-                if (len(test_acc) > 40 and
-                            np.std(train_acc[len(train_acc) - 30: len(train_acc) - 1]) < 0.5 and
-                            np.std(test_acc[len(test_acc) - 30: len(test_acc) - 1]) < 0.5):
-                    print "==> parallel"
-                    break
-
-            print ('babi task id: %2d' % self.args.babi_id)
-            print ('epoch: %2d' % len(epochs))
-            print ('training acc.: %f' % np.max(train_acc))
-            print ('testing acc.: %f' % np.max(test_acc))
-
-            state_name = '%s/%s.state'%(self.folder_name, self.network_name)
-            print "==> saving ... %s" % state_name
-            self.dam.save_params(state_name, epoch)
-
-            imageName = '%s/task_%s.pdf' % (self.folder_name, self.args.babi_id)
-            pp = PdfPages(imageName)
-            plt.savefig(pp, format='pdf')
-            pp.close()
-            plt.close()
-
-        elif self.args.mode == 'test':
-            file = open('last_tested_model.json', 'w+')
-            data = dict(self.args._get_kwargs())
-            data["id"] = self.network_name
-            data["name"] = self.network_name
-            data["description"] = ""
-            data["vocab"] = self.dam.vocab.keys()
-            json.dump(data, file, indent=2)
-            self.do_epoch('test', 0)
-
-        else:
-            raise Exception("unknown mode")
+    def test(self, acc_delta):
+        file = open('last_tested_model.json', 'w+')
+        data = dict(self.args._get_kwargs())
+        data["id"] = self.network_name
+        data["name"] = self.network_name
+        data["description"] = ""
+        data["vocab"] = self.dam.vocab.keys()
+        json.dump(data, file, indent=2)
+        self.do_epoch('test', 0)

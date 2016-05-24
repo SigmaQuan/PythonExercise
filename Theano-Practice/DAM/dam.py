@@ -13,6 +13,9 @@ import word
 
 floatX = theano.config.floatX
 
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
+
 
 class DAM:
     def __init__(self, babi_train_raw, babi_test_raw, word2vec, word_vector_size, dim,
@@ -287,7 +290,6 @@ class DAM:
                                      self.W_inp_upd_in, self.W_inp_upd_hid, self.b_inp_upd,
                                      self.W_inp_hid_in, self.W_inp_hid_hid, self.b_inp_hid)
 
-
     def new_attention_step(self, ct, prev_g, mem, q_q):
         z = T.concatenate([ct, mem, q_q, ct * q_q, ct * mem, (ct - q_q) ** 2, (ct - mem) ** 2], axis=0)
         # z = T.concatenate(
@@ -484,6 +486,44 @@ class DAM:
         combined = zip(self.train_input, self.train_q, self.train_answer, self.train_fact_count, self.train_input_mask)
         random.shuffle(combined)
         self.train_input, self.train_q, self.train_answer, self.train_fact_count, self.train_input_mask = zip(*combined)
+
+
+    def print_input_module(self):
+        print(self.W_inp_res_in.get_value())
+        print(self.W_inp_res_hid.get_value())
+        print(self.b_inp_res.get_value())
+
+        print(self.W_inp_upd_in.get_value())
+        print(self.W_inp_upd_hid.get_value())
+        print(self.b_inp_upd.get_value())
+
+        print(self.W_inp_hid_in.get_value())
+        print(self.W_inp_hid_hid.get_value())
+        print(self.b_inp_hid.get_value())
+
+
+    def show_input_module(self):
+        # input module
+
+        fig = plt.figure()
+        plt.imshow(self.W_inp_res_in.get_value())
+
+        # plt.subplots_adjust(bottom=0.1, right=0.8, top=0.9)
+        # cax = plt.axes([0.85, 0.1, 0.075, 0.8])
+        # plt.colorbar(cax=cax)
+        plt.colorbar()
+        plt.show()
+        plt.pause(0.05)
+
+
+    # def show_memory_module(self):
+
+    def show_weight(self):
+        self.show_input_module()
+        # self.show_memory_module()
+
+    def print_weight(self):
+        self.print_input_module()
 
 
     def step(self, batch_index, mode):
