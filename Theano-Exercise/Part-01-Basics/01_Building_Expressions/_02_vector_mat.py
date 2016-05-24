@@ -28,8 +28,9 @@ def elemwise_mul(a, b):
     :param b: a theano matrix
     :return: the element-wise product of a and b.
     """
-    c = a*b
-    return c
+    # c = a*b
+    # return c
+    return a*b
 
 
 def matrix_vector_mul(a, b):
@@ -39,7 +40,8 @@ def matrix_vector_mul(a, b):
     :param b: a theano vector.
     :return: the matrix-vector product of a and b.
     """
-    return a*b
+    # return a*b
+    return tensor.dot(a, b)
 
 
 if __name__ == "__main__":
@@ -58,8 +60,7 @@ if __name__ == "__main__":
     d_value = rng.randn(5, 5).astype(d.dtype)
     expected = np.dot(d_value, c_value)
 
-    actual = f([a_value, b_value, d_value], expected)
+    actual = f(a_value, b_value, d_value)
 
     assert np.allclose(actual, expected)
     print("SUCCESS!")
-
