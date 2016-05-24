@@ -12,7 +12,8 @@ def make_tensor(dim):
     :return: a new theano tensor with no broadcastable dimensions.
     """
     # return tensor.TensorType('float64', (False,)*dim)
-    return tensor.TensorType(broadcastable=tuple([False] * dim), dtype='float32')()
+    return tensor.TensorType(broadcastable=tuple([False] * dim),
+                             dtype='float32')()
     # raise NotImplementatedError("TODO: implement this function")
 
 
