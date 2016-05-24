@@ -21,6 +21,7 @@ def increment_odd(x):
 if __name__ == "__main__":
     x = T.vector()
     xv = np.zeros((4,), dtype=x.dtype)
+    # print x[1::2]
     yv = increment_odd(x).eval({x:xv})
     print yv
     assert np.allclose(yv, np.array([0., 1., 0., 1.]))
