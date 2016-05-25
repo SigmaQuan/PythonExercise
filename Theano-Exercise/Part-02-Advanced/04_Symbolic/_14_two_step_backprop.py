@@ -89,7 +89,7 @@ if __name__ == "__main__":
     H, y_hat = mlp.fprop(X)
     l = loss(y_hat, y)
     # g_W, g_w = tensor.grad(cost=l, wrt=[mlp.W_hid, mlp.W_out])
-    g_W, g_w = tensor.grad(cost=l, wrt=[mlp.W_hid, mlp.W_out])
+    g_W, g_w = tensor.grad(l, [mlp.W_hid, mlp.W_out])
     rng = np.random.RandomState([1, 2, 3])
     m = 5
     f = function(inputs=[X, y], outputs=[g_W, g_w])
@@ -100,6 +100,6 @@ if __name__ == "__main__":
     g_w2, aux = f1(X, y)
     assert np.allclose(g_w, g_w2)
     # Give w_out the wrong size to make sure f2 can't use it
-    mlp.W_out.set_value(np.ones(1).astype(mlp.w_out.dtype))
+    mlp.W_out.set_value(np.ones(1).astype(mlp.W_out.dtype))
     g_W2 = f2(X, aux)
     print('SUCCESS!')
