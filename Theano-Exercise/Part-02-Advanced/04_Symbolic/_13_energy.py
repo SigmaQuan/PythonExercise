@@ -49,12 +49,14 @@ if __name__ == "__main__":
     ph = tensor.nnet.sigmoid(tensor.dot(v, W))
     h = rng_factory.binomial(p=ph, size=ph.shape, dtype=W.dtype)
 
+    #***** NOT UNDERSTAND
     class _ElemwiseNoGradient(theano.tensor.Elemwise):
         def grad(self, inputs, output_gradients):
             raise TypeError("You shouldn't be differentiating "
                             "through the sampling process.")
             return [theano.gradient.DisconnectedType()()]
     block_gradient = _ElemwiseNoGradient(theano.scalar.identity)
+    #***** NOT UNDERSTAND
 
     v = block_gradient(v)
     h = block_gradient(h)
