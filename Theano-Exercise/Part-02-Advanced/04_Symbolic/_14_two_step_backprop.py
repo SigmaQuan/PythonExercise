@@ -46,7 +46,7 @@ class SimpleMLP(object):
 
     def two_step_backprop(self, mlp):
         """
-
+        Back-propagation of MLPs.
         :param mlp: a SimpleMLP instance.
         :return: two theano functions.
         f1: a theano function,
