@@ -228,14 +228,14 @@ class DAM:
             # self.W_ans_hid_hid = util.uniform_param(std=0.1, shape=(self.dim, self.dim))
             # self.b_ans_hid = util.constant_param(value=0.0, shape=(self.dim,))
 
-            def answer_step(prev_a, prev_y):
-                a = self.GRU_update(prev_a, T.concatenate([prev_y, self.q_q]),
-                                  self.W_ans_res_in, self.W_ans_res_hid, self.b_ans_res,
-                                  self.W_ans_upd_in, self.W_ans_upd_hid, self.b_ans_upd,
-                                  self.W_ans_hid_in, self.W_ans_hid_hid, self.b_ans_hid)
-
-                y = util.softmax(T.dot(self.W_a, a))
-                return [a, y]
+            # def answer_step(prev_a, prev_y):
+            #     a = self.GRU_update(prev_a, T.concatenate([prev_y, self.q_q]),
+            #                       self.W_ans_res_in, self.W_ans_res_hid, self.b_ans_res,
+            #                       self.W_ans_upd_in, self.W_ans_upd_hid, self.b_ans_upd,
+            #                       self.W_ans_hid_in, self.W_ans_hid_hid, self.b_ans_hid)
+            #
+            #     y = util.softmax(T.dot(self.W_a, a))
+            #     return [a, y]
 
             # TODO: add conditional ending
             dummy = theano.shared(np.zeros((self.vocab_size, self.batch_size), dtype=floatX))
@@ -289,6 +289,14 @@ class DAM:
                                                self.fact_count_var, self.input_mask_var],
                                        outputs=[self.prediction, self.loss])
 
+    def answer_step(self, prev_a, prev_y):
+        a = self.GRU_update(prev_a, T.concatenate([prev_y, self.q_q]),
+                          self.W_ans_res_in, self.W_ans_res_hid, self.b_ans_res,
+                          self.W_ans_upd_in, self.W_ans_upd_hid, self.b_ans_upd,
+                          self.W_ans_hid_in, self.W_ans_hid_hid, self.b_ans_hid)
+
+        y = util.softmax(T.dot(self.W_a, a))
+        return [a, y]
 
     def GRU_update(self, h, x, W_res_in, W_res_hid, b_res,
                          W_upd_in, W_upd_hid, b_upd,
