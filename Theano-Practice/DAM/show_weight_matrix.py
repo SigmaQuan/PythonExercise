@@ -16,7 +16,7 @@ def show(w, w_title):
     # show w_z matrix of update gate.
     axes_w = plt.gca()
     plt.imshow(w)
-    plt.colorbar()
+    plt.colorbar(orientation="horizontal")
     plt.xlabel("$w_{1}$")
     plt.ylabel("$w_{2}$")
     axes_w.set_xticks([])
