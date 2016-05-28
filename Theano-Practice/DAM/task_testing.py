@@ -127,10 +127,13 @@ class TestOneTask:
         # self.dam.show_memory_module()
         self.dam.show_weight()
         file = open('last_tested_model.json', 'w+')
+        self.dump_args2json_file(file)
+        self.do_epoch('test', 1)
+
+    def dump_args2json_file(self, file):
         data = dict(self.args._get_kwargs())
         data["id"] = self.network_name
         data["name"] = self.network_name
         data["description"] = ""
         data["vocab"] = self.dam.vocab.keys()
         json.dump(data, file, indent=2)
-        self.do_epoch('test', 1)

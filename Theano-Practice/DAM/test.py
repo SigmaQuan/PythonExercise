@@ -17,14 +17,14 @@ args = hyper_parameter.produce_one_arg()
 args.babi_id = "1"
 # args.load_state = "task_1.epoch_056.train_96.200.test_51.800.state"
 # args.load_state = "task_1.epoch_080.train_100.000.test_99.900.state"
-args.load_state = "task_1.state"
+args.load_state = "state/task_1.state"
 args.mode = "test"
 
 # load word vector: glove
 word2vec = word.load_glove(args.word_vector_size)
 
 print "==> testing each task.."
-folder_name = time.strftime('experiment/test-%Y-%m-%d %H:%M:%S')
+folder_name = time.strftime('experiment/test-%Y-%m-%d-%H-%M-%S')
 os.makedirs(folder_name)
 i = 1
 print "Testing task %d..." % i

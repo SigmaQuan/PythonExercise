@@ -26,7 +26,7 @@ acc_delta = [99.9, 99.9, 99.9, 99.9, 99.5,
              99.9, 99.9, 99.9, 99.9, 99.9,
              99.9, 66.0, 95.9, 40.0, 99.9]
 
-folder_name = time.strftime('experiment/%Y-%m-%d %H:%M:%S')
+folder_name = time.strftime('experiment/%Y-%m-%d-%H-%M-%S')
 os.makedirs(folder_name)
 # print acc_delta
 for i in range(0, 20, 1):

@@ -72,7 +72,6 @@ class TrainOneTask:
         else:
             raise Exception("No such network known: " + self.args.network)
 
-
     def do_epoch(self, mode, epoch, skipped=0):
         y_true = []
         y_pred = []
@@ -122,7 +121,6 @@ class TrainOneTask:
         print "accuracy: %.2f percent" % accuracy
 
         return accuracy, avg_loss, skipped
-
 
     def train(self, acc_delta):
         fig = plt.figure()
@@ -214,15 +212,22 @@ class TrainOneTask:
             pp.close()
             plt.close()
 
+            json_file_path = '%s/%s.json'%(self.folder_name, self.network_name)
+            print "==> saving ... %s" % json_file_path
+            self.dump_args2json_file(json_file_path)
+
         elif self.args.mode == 'test':
-            file = open('last_tested_model.json', 'w+')
-            data = dict(self.args._get_kwargs())
-            data["id"] = self.network_name
-            data["name"] = self.network_name
-            data["description"] = ""
-            data["vocab"] = self.dam.vocab.keys()
-            json.dump(data, file, indent=2)
+            self.dump_args2json_file(self.folder_name + 'last_tested_model.json')
             self.do_epoch('test', 0)
 
         else:
             raise Exception("unknown mode")
+
+    def dump_args2json_file(self, file_path):
+        file = open(file_path, 'w+')
+        data = dict(self.args._get_kwargs())
+        data["id"] = self.network_name
+        data["name"] = self.network_name
+        data["description"] = ""
+        data["vocab"] = self.dam.vocab.keys()
+        json.dump(data, file, indent=2)
