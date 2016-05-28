@@ -15,12 +15,36 @@ floatX = theano.config.floatX
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
+from show_gru_weight import show
+import show_weight_matrix
+
+import lasagne
+import lasagne.nonlinearities as nonlin
 
 
 class DAM:
     def __init__(self, babi_train_raw, babi_test_raw, word2vec, word_vector_size, dim,
                 mode, answer_module, input_mask_mode, memory_hops, batch_size, l2,
                 normalize_attention, batch_norm, dropout, **kwargs):
+        """
+        Class of Dynamical Attentive M
+        :param babi_train_raw:
+        :param babi_test_raw:
+        :param word2vec:
+        :param word_vector_size:
+        :param dim:
+        :param mode:
+        :param answer_module:
+        :param input_mask_mode:
+        :param memory_hops:
+        :param batch_size:
+        :param l2:
+        :param normalize_attention:
+        :param batch_norm:
+        :param dropout:
+        :param kwargs:
+        :return:
+        """
 
         print "==> not used params in DAM class:", kwargs.keys()
 
@@ -46,6 +70,7 @@ class DAM:
         self.train_answer, \
         self.train_fact_count, \
         self.train_input_mask = self._process_input(babi_train_raw)
+
         self.test_input, \
         self.test_q, \
         self.test_answer, \
@@ -53,11 +78,15 @@ class DAM:
         self.test_input_mask = self._process_input(babi_test_raw)
         self.vocab_size = len(self.vocab)
 
-        self.input_var = T.tensor3('input_var') # (batch_size, seq_len, glove_dim)
-        self.q_var = T.tensor3('question_var') # as self.input_var
-        self.answer_var = T.ivector('answer_var') # answer of example in mini-batch
-        self.fact_count_var = T.ivector('fact_count_var') # number of facts in the example of mini-batch
-        self.input_mask_var = T.imatrix('input_mask_var') # (batch_size, indices)
+        # (batch_size, seq_len, glove_dim)
+        self.input_var = T.tensor3('input_var')
+        self.q_var = T.tensor3('question_var')  # as self.input_var
+        # answer of example in mini-batch
+        self.answer_var = T.ivector('answer_var')
+        # number of facts in the example of mini-batch
+        self.fact_count_var = T.ivector('fact_count_var')
+        # (batch_size, indices)
+        self.input_mask_var = T.imatrix('input_mask_var')
 
         print "==> building input module"
         self.W_inp_res_in = util.normal_param(std=0.1, shape=(self.dim, self.word_vector_size))
@@ -225,7 +254,7 @@ class DAM:
                   self.W_inp_hid_in, self.W_inp_hid_hid, self.b_inp_hid,
                   self.W_mem_res_in, self.W_mem_res_hid, self.b_mem_res,
                   self.W_mem_upd_in, self.W_mem_upd_hid, self.b_mem_upd,
-                  self.W_mem_hid_in, self.W_mem_hid_hid, self.b_mem_hid, #self.W_b
+                  self.W_mem_hid_in, self.W_mem_hid_hid, self.b_mem_hid,  # self.W_b,
                   # self.W_mem_hid_in, self.W_mem_hid_hid, self.b_mem_hid, self.W_b,
                   self.W_1, self.W_2, self.b_1, self.b_2, self.W_a]
 
@@ -303,7 +332,6 @@ class DAM:
         #      T.dot(T.dot(self.W_b, ct), q_q),
         #      T.dot(T.dot(self.W_b, ct), mem)
         #     ], axis=0)
-
         # z = T.concatenate(
         #     [ct,
         #      mem,
@@ -435,12 +463,13 @@ class DAM:
             q = x["Q"].lower().split(' ')
             q = [w for w in q if len(w) > 0]
 
-            inp_vector = [word.process_word(word = w,
-                                                   word2vec = self.word2vec,
-                                                   vocab = self.vocab,
-                                                   ivocab = self.ivocab,
-                                                   word_vector_size = self.word_vector_size,
-                                                   to_return = "word2vec") for w in inp]
+            inp_vector = [word.process_word(
+                word=w,
+                word2vec=self.word2vec,
+                vocab=self.vocab,
+                ivocab=self.ivocab,
+                word_vector_size=self.word_vector_size,
+                to_return="word2vec") for w in inp]
 
             q_vector = [word.process_word(word = w,
                                                  word2vec = self.word2vec,
@@ -503,24 +532,64 @@ class DAM:
 
 
     def show_input_module(self):
-        # input module
+        # weight visualization of input module
+        w_z = self.W_inp_upd_in.get_value()
+        u_z = self.W_inp_upd_hid.get_value()
+        w_r = self.W_inp_res_in.get_value()
+        u_r = self.W_inp_res_hid.get_value()
+        w_h = self.W_inp_hid_in.get_value()
+        u_h = self.W_inp_hid_hid.get_value()
+        w_z_title = "$Update\ gate: $\n $z_{t} = \sigma(W^{(z)}x_{t}+U^{(z)}h_{t-1}+b^{(z)})$\n $W^{(z)}$"
+        u_z_title = "$Update\ gate: $\n $z_{t} = \sigma(W^{(z)}x_{t}+U^{(z)}h_{t-1}+b^{(z)})$\n $U^{(z)}$"
+        w_r_title = "$Reset\ gate: $\n $r_{t} = \sigma(W^{(r)}x_{t}+U^{(r)}h_{t-1}+b^{(r)})$\n $W^{(r)}$"
+        u_r_title = "$Reset\ gate: $\n $r_{t} = \sigma(W^{(r)}x_{t}+U^{(r)}h_{t-1}+b^{(r)})$\n $U^{(r)}$"
+        w_h_title = "$Hidden: $\n $\\tilde{h}_{t} = \\tanh(Wx_{t}+U(r_{t}\odot h_{t-1})+b^{(h)})$\n $W$"
+        u_h_title = "$Hidden: $\n $\\tilde{h}_{t} = \\tanh(Wx_{t}+U(r_{t}\odot h_{t-1})+b^{(h)})$\n $U$"
+        show(w_z, w_z_title, u_z, u_z_title, w_r, w_r_title, u_r, u_r_title,
+             w_h, w_h_title, u_h, u_h_title)
 
-        fig = plt.figure()
-        plt.imshow(self.W_inp_res_in.get_value())
+    def show_memory_module(self):
+        # weight visualization of memory module
+        w_z = self.W_mem_upd_in.get_value()
+        u_z = self.W_mem_upd_hid.get_value()
+        w_r = self.W_mem_res_in.get_value()
+        u_r = self.W_mem_res_hid.get_value()
+        w_h = self.W_mem_hid_in.get_value()
+        u_h = self.W_mem_hid_hid.get_value()
+        w_z_title = "$Update\ gate: $\n $z_{t} = \sigma(W^{(z)}x_{t}+U^{(z)}h_{t-1}+b^{(z)})$\n $W^{(z)}$"
+        u_z_title = "$Update\ gate: $\n $z_{t} = \sigma(W^{(z)}x_{t}+U^{(z)}h_{t-1}+b^{(z)})$\n $U^{(z)}$"
+        w_r_title = "$Reset\ gate: $\n $r_{t} = \sigma(W^{(r)}x_{t}+U^{(r)}h_{t-1}+b^{(r)})$\n $W^{(r)}$"
+        u_r_title = "$Reset\ gate: $\n $r_{t} = \sigma(W^{(r)}x_{t}+U^{(r)}h_{t-1}+b^{(r)})$\n $U^{(r)}$"
+        w_h_title = "$Hidden: $\n $\\tilde{h}_{t} = \\tanh(Wx_{t}+U(r_{t}\odot h_{t-1})+b^{(h)})$\n $W$"
+        u_h_title = "$Hidden: $\n $\\tilde{h}_{t} = \\tanh(Wx_{t}+U(r_{t}\odot h_{t-1})+b^{(h)})$\n $U$"
+        show(w_z, w_z_title, u_z, u_z_title, w_r, w_r_title, u_r, u_r_title,
+             w_h, w_h_title, u_h, u_h_title)
 
-        # plt.subplots_adjust(bottom=0.1, right=0.8, top=0.9)
-        # cax = plt.axes([0.85, 0.1, 0.075, 0.8])
-        # plt.colorbar(cax=cax)
-        plt.colorbar()
-        plt.show()
-        plt.pause(0.05)
-
-
-    # def show_memory_module(self):
+    def show_answer_module(self):
+        # weight visualization of answer module
+        if self.answer_module == 'feedforward':
+            w = self.W_a.get_value()
+            show_weight_matrix.show(w, "$Feedforward\ Nets$")
+        elif self.answer_module == 'recurrent':
+            w_z = self.W_ans_upd_in.get_value()
+            u_z = self.W_ans_upd_hid.get_value()
+            w_r = self.W_ans_res_in.get_value()
+            u_r = self.W_ans_res_hid.get_value()
+            w_h = self.W_ans_hid_in.get_value()
+            u_h = self.W_ans_hid_hid.get_value()
+            w_z_title = "$Update\ gate: $\n $z_{t} = \sigma(W^{(z)}x_{t}+U^{(z)}h_{t-1}+b^{(z)})$\n $W^{(z)}$"
+            u_z_title = "$Update\ gate: $\n $z_{t} = \sigma(W^{(z)}x_{t}+U^{(z)}h_{t-1}+b^{(z)})$\n $U^{(z)}$"
+            w_r_title = "$Reset\ gate: $\n $r_{t} = \sigma(W^{(r)}x_{t}+U^{(r)}h_{t-1}+b^{(r)})$\n $W^{(r)}$"
+            u_r_title = "$Reset\ gate: $\n $r_{t} = \sigma(W^{(r)}x_{t}+U^{(r)}h_{t-1}+b^{(r)})$\n $U^{(r)}$"
+            w_h_title = "$Hidden: $\n $\\tilde{h}_{t} = \\tanh(Wx_{t}+U(r_{t}\odot h_{t-1})+b^{(h)})$\n $W$"
+            u_h_title = "$Hidden: $\n $\\tilde{h}_{t} = \\tanh(Wx_{t}+U(r_{t}\odot h_{t-1})+b^{(h)})$\n $U$"
+            show(w_z, w_z_title, u_z, u_z_title, w_r, w_r_title, u_r, u_r_title,
+                 w_h, w_h_title, u_h, u_h_title)
 
     def show_weight(self):
         self.show_input_module()
-        # self.show_memory_module()
+        self.show_memory_module()
+        self.show_answer_module()
 
     def print_weight(self):
         self.print_input_module()

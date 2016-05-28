@@ -122,7 +122,10 @@ class TestOneTask:
 
         return accuracy, avg_loss, skipped
 
-    def test(self, acc_delta):
+    def test(self):
+        # self.dam.show_input_module()
+        # self.dam.show_memory_module()
+        self.dam.show_weight()
         file = open('last_tested_model.json', 'w+')
         data = dict(self.args._get_kwargs())
         data["id"] = self.network_name
@@ -130,4 +133,4 @@ class TestOneTask:
         data["description"] = ""
         data["vocab"] = self.dam.vocab.keys()
         json.dump(data, file, indent=2)
-        self.do_epoch('test', 0)
+        self.do_epoch('test', 1)

@@ -32,7 +32,6 @@ class TrainOneTask:
     def set_folder_name(self, folder_name):
         self.folder_name = folder_name
 
-
     # set network name
     def set_network_name(self):
         return self.args.prefix + '%s.mh%d.n%d.bs%d%s%s%s.babi%s' % (
@@ -50,6 +49,8 @@ class TrainOneTask:
         if self.args.network == 'dmn_batch':
             import dam
             return dam.DAM(**self.args_dict)
+            # import dam_new
+            # return dam_new.DAM(**self.args_dict)
         # elif self.args.network == 'dmn_basic':
         #     import dmn_basic
         #     if (self.args.batch_size != 1):
@@ -158,7 +159,8 @@ class TrainOneTask:
 
                 # print "show weight matrix"
                 # self.dam.show_weight()
-                self.dam.print_input_module()
+                # self.dam.print_input_module()
+                # self.dam.show_input_module()
 
                 # train_error.append(training_loss)
                 # test_error.append(test_loss)
@@ -197,7 +199,7 @@ class TrainOneTask:
                     print "==> parallel"
                     break
 
-            print ('babi task id: %2d' % self.args.babi_id)
+            print ('babi task id: %s' % self.args.babi_id)
             print ('epoch: %2d' % len(epochs))
             print ('training acc.: %f' % np.max(train_acc))
             print ('testing acc.: %f' % np.max(test_acc))
