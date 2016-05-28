@@ -16,7 +16,8 @@ hyper_parameter = HyperParameterSpace()
 args = hyper_parameter.produce_one_arg()
 args.babi_id = "1"
 # args.load_state = "task_1.epoch_056.train_96.200.test_51.800.state"
-args.load_state = "task_1.epoch_080.train_100.000.test_99.900.state"
+# args.load_state = "task_1.epoch_080.train_100.000.test_99.900.state"
+args.load_state = "task_1.state"
 args.mode = "test"
 
 # load word vector: glove
