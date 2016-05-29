@@ -32,7 +32,6 @@ class TestOneTask:
     def set_folder_name(self, folder_name):
         self.folder_name = folder_name
 
-
     # set network name
     def set_network_name(self):
         return self.args.prefix + '%s.mh%d.n%d.bs%d%s%s%s.babi%s' % (
@@ -71,7 +70,6 @@ class TestOneTask:
         else:
             raise Exception("No such network known: " + self.args.network)
 
-
     def do_epoch(self, mode, epoch, skipped=0):
         y_true = []
         y_pred = []
@@ -102,9 +100,13 @@ class TestOneTask:
                 # TODO: save the state sometimes
                 if (i % self.args.log_every == 0):
                     cur_time = time.time()
-                    print ("  %sing: %d.%d / %d \t loss: %.3f \t avg_loss: %.3f \t skipped: %d \t %s \t time: %.2fs" %
-                           (mode, epoch, i * self.args.batch_size, batches_per_epoch * self.args.batch_size,
-                            current_loss, avg_loss / (i + 1), skipped, log, cur_time - prev_time))
+                    print ("  %sing: %d.%d / %d \t "
+                           "loss: %.3f \t avg_loss: %.3f \t "
+                           "skipped: %d \t %s \t time: %.2fs" %
+                           (mode, epoch, i * self.args.batch_size,
+                            batches_per_epoch * self.args.batch_size,
+                            current_loss, avg_loss / (i + 1), skipped,
+                            log, cur_time - prev_time))
                     prev_time = cur_time
 
             if np.isnan(current_loss):
@@ -126,11 +128,11 @@ class TestOneTask:
         # self.dam.show_input_module()
         # self.dam.show_memory_module()
         self.dam.show_weight()
-        file = open('last_tested_model.json', 'w+')
-        self.dump_args2json_file(file)
+        self.dump_args2json_file(self.folder_name + 'last_tested_model.json')
         self.do_epoch('test', 1)
 
-    def dump_args2json_file(self, file):
+    def dump_args2json_file(self, file_path):
+        file = open(file_path, 'w+')
         data = dict(self.args._get_kwargs())
         data["id"] = self.network_name
         data["name"] = self.network_name

@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from show_gru_weight import show
 import show_weight_matrix
+import show_attention_weight
 
 import lasagne
 import lasagne.nonlinearities as nonlin
@@ -358,7 +359,6 @@ class DAM:
         G = T.nnet.sigmoid(l_2)[0]
         return G
 
-
     def new_episode_step(self, ct, g, prev_h):
         gru = self.GRU_update(prev_h, ct,
                              self.W_mem_res_in, self.W_mem_res_hid, self.b_mem_res,
@@ -547,12 +547,18 @@ class DAM:
         u_r = self.W_inp_res_hid.get_value()
         w_h = self.W_inp_hid_in.get_value()
         u_h = self.W_inp_hid_hid.get_value()
-        w_z_title = "$Update\ gate: $\n $z_{t} = \sigma(W^{(z)}x_{t}+U^{(z)}h_{t-1}+b^{(z)})$\n $W^{(z)}$"
-        u_z_title = "$Update\ gate: $\n $z_{t} = \sigma(W^{(z)}x_{t}+U^{(z)}h_{t-1}+b^{(z)})$\n $U^{(z)}$"
-        w_r_title = "$Reset\ gate: $\n $r_{t} = \sigma(W^{(r)}x_{t}+U^{(r)}h_{t-1}+b^{(r)})$\n $W^{(r)}$"
-        u_r_title = "$Reset\ gate: $\n $r_{t} = \sigma(W^{(r)}x_{t}+U^{(r)}h_{t-1}+b^{(r)})$\n $U^{(r)}$"
-        w_h_title = "$Hidden: $\n $\\tilde{h}_{t} = \\tanh(Wx_{t}+U(r_{t}\odot h_{t-1})+b^{(h)})$\n $W$"
-        u_h_title = "$Hidden: $\n $\\tilde{h}_{t} = \\tanh(Wx_{t}+U(r_{t}\odot h_{t-1})+b^{(h)})$\n $U$"
+        w_z_title = "$Update\ gate: $\n $z_{t} = \sigma(W^{(z)}x_{t}+" \
+                    "U^{(z)}h_{t-1}+b^{(z)})$\n $W^{(z)}$"
+        u_z_title = "$Update\ gate: $\n $z_{t} = \sigma(W^{(z)}x_{t}+" \
+                    "U^{(z)}h_{t-1}+b^{(z)})$\n $U^{(z)}$"
+        w_r_title = "$Reset\ gate: $\n $r_{t} = \sigma(W^{(r)}x_{t}+" \
+                    "U^{(r)}h_{t-1}+b^{(r)})$\n $W^{(r)}$"
+        u_r_title = "$Reset\ gate: $\n $r_{t} = \sigma(W^{(r)}x_{t}+" \
+                    "U^{(r)}h_{t-1}+b^{(r)})$\n $U^{(r)}$"
+        w_h_title = "$Hidden: $\n $\\tilde{h}_{t} = \\tanh(Wx_{t}+" \
+                    "U(r_{t}\odot h_{t-1})+b^{(h)})$\n $W$"
+        u_h_title = "$Hidden: $\n $\\tilde{h}_{t} = \\tanh(Wx_{t}+" \
+                    "U(r_{t}\odot h_{t-1})+b^{(h)})$\n $U$"
         show(w_z, w_z_title, u_z, u_z_title, w_r, w_r_title, u_r, u_r_title,
              w_h, w_h_title, u_h, u_h_title)
 
@@ -564,44 +570,63 @@ class DAM:
         u_r = self.W_mem_res_hid.get_value()
         w_h = self.W_mem_hid_in.get_value()
         u_h = self.W_mem_hid_hid.get_value()
-        w_z_title = "$Update\ gate: $\n $z_{t} = \sigma(W^{(z)}x_{t}+U^{(z)}h_{t-1}+b^{(z)})$\n $W^{(z)}$"
-        u_z_title = "$Update\ gate: $\n $z_{t} = \sigma(W^{(z)}x_{t}+U^{(z)}h_{t-1}+b^{(z)})$\n $U^{(z)}$"
-        w_r_title = "$Reset\ gate: $\n $r_{t} = \sigma(W^{(r)}x_{t}+U^{(r)}h_{t-1}+b^{(r)})$\n $W^{(r)}$"
-        u_r_title = "$Reset\ gate: $\n $r_{t} = \sigma(W^{(r)}x_{t}+U^{(r)}h_{t-1}+b^{(r)})$\n $U^{(r)}$"
-        w_h_title = "$Hidden: $\n $\\tilde{h}_{t} = \\tanh(Wx_{t}+U(r_{t}\odot h_{t-1})+b^{(h)})$\n $W$"
-        u_h_title = "$Hidden: $\n $\\tilde{h}_{t} = \\tanh(Wx_{t}+U(r_{t}\odot h_{t-1})+b^{(h)})$\n $U$"
+        w_z_title = "$Update\ gate: $\n $z_{t} = \sigma(W^{(z)}x_{t}+" \
+                    "U^{(z)}h_{t-1}+b^{(z)})$\n $W^{(z)}$"
+        u_z_title = "$Update\ gate: $\n $z_{t} = \sigma(W^{(z)}x_{t}+" \
+                    "U^{(z)}h_{t-1}+b^{(z)})$\n $U^{(z)}$"
+        w_r_title = "$Reset\ gate: $\n $r_{t} = \sigma(W^{(r)}x_{t}+" \
+                    "U^{(r)}h_{t-1}+b^{(r)})$\n $W^{(r)}$"
+        u_r_title = "$Reset\ gate: $\n $r_{t} = \sigma(W^{(r)}x_{t}+" \
+                    "U^{(r)}h_{t-1}+b^{(r)})$\n $U^{(r)}$"
+        w_h_title = "$Hidden: $\n $\\tilde{h}_{t} = \\tanh(Wx_{t}+" \
+                    "U(r_{t}\odot h_{t-1})+b^{(h)})$\n $W$"
+        u_h_title = "$Hidden: $\n $\\tilde{h}_{t} = \\tanh(Wx_{t}+" \
+                    "U(r_{t}\odot h_{t-1})+b^{(h)})$\n $U$"
         show(w_z, w_z_title, u_z, u_z_title, w_r, w_r_title, u_r, u_r_title,
              w_h, w_h_title, u_h, u_h_title)
 
     def show_answer_module(self):
         # weight visualization of answer module
-        if self.answer_module == 'feedforward':
-            w = self.W_a.get_value()
-            show_weight_matrix.show(w, "$Feedforward\ Nets$")
-        elif self.answer_module == 'recurrent':
+        if self.answer_module == 'recurrent':
             w_z = self.W_ans_upd_in.get_value()
             u_z = self.W_ans_upd_hid.get_value()
             w_r = self.W_ans_res_in.get_value()
             u_r = self.W_ans_res_hid.get_value()
             w_h = self.W_ans_hid_in.get_value()
             u_h = self.W_ans_hid_hid.get_value()
-            w_z_title = "$Update\ gate: $\n $z_{t} = \sigma(W^{(z)}x_{t}+U^{(z)}h_{t-1}+b^{(z)})$\n $W^{(z)}$"
-            u_z_title = "$Update\ gate: $\n $z_{t} = \sigma(W^{(z)}x_{t}+U^{(z)}h_{t-1}+b^{(z)})$\n $U^{(z)}$"
-            w_r_title = "$Reset\ gate: $\n $r_{t} = \sigma(W^{(r)}x_{t}+U^{(r)}h_{t-1}+b^{(r)})$\n $W^{(r)}$"
-            u_r_title = "$Reset\ gate: $\n $r_{t} = \sigma(W^{(r)}x_{t}+U^{(r)}h_{t-1}+b^{(r)})$\n $U^{(r)}$"
-            w_h_title = "$Hidden: $\n $\\tilde{h}_{t} = \\tanh(Wx_{t}+U(r_{t}\odot h_{t-1})+b^{(h)})$\n $W$"
-            u_h_title = "$Hidden: $\n $\\tilde{h}_{t} = \\tanh(Wx_{t}+U(r_{t}\odot h_{t-1})+b^{(h)})$\n $U$"
+            w_z_title = "$Update\ gate: $\n $z_{t} = \sigma(W^{(z)}x_{t}+" \
+                        "U^{(z)}h_{t-1}+b^{(z)})$\n $W^{(z)}$"
+            u_z_title = "$Update\ gate: $\n $z_{t} = \sigma(W^{(z)}x_{t}+" \
+                        "U^{(z)}h_{t-1}+b^{(z)})$\n $U^{(z)}$"
+            w_r_title = "$Reset\ gate: $\n $r_{t} = \sigma(W^{(r)}x_{t}+" \
+                        "U^{(r)}h_{t-1}+b^{(r)})$\n $W^{(r)}$"
+            u_r_title = "$Reset\ gate: $\n $r_{t} = \sigma(W^{(r)}x_{t}+" \
+                        "U^{(r)}h_{t-1}+b^{(r)})$\n $U^{(r)}$"
+            w_h_title = "$Hidden: $\n $\\tilde{h}_{t} = \\tanh(Wx_{t}+" \
+                        "U(r_{t}\odot h_{t-1})+b^{(h)})$\n $W$"
+            u_h_title = "$Hidden: $\n $\\tilde{h}_{t} = \\tanh(Wx_{t}+" \
+                        "U(r_{t}\odot h_{t-1})+b^{(h)})$\n $U$"
             show(w_z, w_z_title, u_z, u_z_title, w_r, w_r_title, u_r, u_r_title,
                  w_h, w_h_title, u_h, u_h_title)
+
+        w = self.W_a.get_value()
+        show_weight_matrix.show(w, "$Last\ layer: Feedforward\ Nets$")
+
+    def show_attention_weight(self):
+        w_1 = self.W_1.get_value()
+        w_2 = self.W_2.get_value()
+        w_1_title = "$First\ layer\ of\ MLP: $\n $h^{(1)} = \\tanh(W^{(1)}x+b^{(1)})$\n $W^{(1)}$"
+        w_2_title = "$Last\ layer\ of\ MLP: $\n $h^{(2)} = \sigma(W^{(2)}h^{(1)}+b^{(2)})$\n $W^{(2)}$"
+        show_attention_weight.show(w_1, w_1_title, w_2, w_2_title)
 
     def show_weight(self):
         self.show_input_module()
         self.show_memory_module()
         self.show_answer_module()
+        self.show_attention_weight()
 
     def print_weight(self):
         self.print_input_module()
-
 
     def step(self, batch_index, mode):
         if mode == "train" and self.mode == "test":
