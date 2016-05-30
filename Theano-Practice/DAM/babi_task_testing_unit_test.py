@@ -9,7 +9,7 @@ from hyperparameter import HyperParameterSpace
 from task_training import TrainOneTask
 
 from hyperparameter import HyperParameterSpace
-from task_testing import TestOneTask
+from babi_task_testing import TestOneTask
 
 print "==> get one argument for each task"
 hyper_parameter = HyperParameterSpace()

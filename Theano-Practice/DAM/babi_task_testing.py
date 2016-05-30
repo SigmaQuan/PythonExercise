@@ -127,8 +127,8 @@ class TestOneTask:
     def test(self):
         # self.dam.show_input_module()
         # self.dam.show_memory_module()
-        self.dam.show_weight()
-        self.dump_args2json_file(self.folder_name + 'last_tested_model.json')
+        self.dam.show_weight(self.folder_name)
+        self.dump_args2json_file(self.folder_name + '/last_tested_model.json')
         self.do_epoch('test', 1)
 
     def dump_args2json_file(self, file_path):

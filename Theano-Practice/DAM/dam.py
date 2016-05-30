@@ -15,9 +15,10 @@ floatX = theano.config.floatX
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
-from show_gru_weight import show
-import show_weight_matrix
-import show_attention_weight
+from nets_visualization import show_weight, show_attention_weight, show_gru_weight
+# from show_gru_weight import show
+# import show_weight_matrix
+# import show_attention_weight
 
 import lasagne
 import lasagne.nonlinearities as nonlin
@@ -508,7 +509,6 @@ class DAM:
 
         return inputs, questions, answers, fact_counts, input_masks
 
-
     def get_batches_per_epoch(self, mode):
         if (mode == 'train'):
             return len(self.train_input) / self.batch_size
@@ -517,13 +517,11 @@ class DAM:
         else:
             raise Exception("unknown mode")
 
-
     def shuffle_train_set(self):
         print "==> Shuffling the train set"
         combined = zip(self.train_input, self.train_q, self.train_answer, self.train_fact_count, self.train_input_mask)
         random.shuffle(combined)
         self.train_input, self.train_q, self.train_answer, self.train_fact_count, self.train_input_mask = zip(*combined)
-
 
     def print_input_module(self):
         print(self.W_inp_res_in.get_value())
@@ -538,8 +536,7 @@ class DAM:
         print(self.W_inp_hid_hid.get_value())
         print(self.b_inp_hid.get_value())
 
-
-    def show_input_module(self):
+    def show_input_module(self, folder):
         # weight visualization of input module
         w_z = self.W_inp_upd_in.get_value()
         u_z = self.W_inp_upd_hid.get_value()
@@ -559,10 +556,13 @@ class DAM:
                     "U(r_{t}\odot h_{t-1})+b^{(h)})$\n $W$"
         u_h_title = "$Hidden: $\n $\\tilde{h}_{t} = \\tanh(Wx_{t}+" \
                     "U(r_{t}\odot h_{t-1})+b^{(h)})$\n $U$"
-        show(w_z, w_z_title, u_z, u_z_title, w_r, w_r_title, u_r, u_r_title,
-             w_h, w_h_title, u_h, u_h_title)
+        image_file = "input_module_gru.pdf"
+        show_gru_weight(
+            w_z, w_z_title, u_z, u_z_title,
+            w_r, w_r_title, u_r, u_r_title,
+            w_h, w_h_title, u_h, u_h_title, folder + "/" + image_file)
 
-    def show_memory_module(self):
+    def show_memory_module(self, folder):
         # weight visualization of memory module
         w_z = self.W_mem_upd_in.get_value()
         u_z = self.W_mem_upd_hid.get_value()
@@ -582,10 +582,13 @@ class DAM:
                     "U(r_{t}\odot h_{t-1})+b^{(h)})$\n $W$"
         u_h_title = "$Hidden: $\n $\\tilde{h}_{t} = \\tanh(Wx_{t}+" \
                     "U(r_{t}\odot h_{t-1})+b^{(h)})$\n $U$"
-        show(w_z, w_z_title, u_z, u_z_title, w_r, w_r_title, u_r, u_r_title,
-             w_h, w_h_title, u_h, u_h_title)
+        image_file = "input_module_gru.pdf"
+        show_gru_weight(
+            w_z, w_z_title, u_z, u_z_title,
+            w_r, w_r_title, u_r, u_r_title,
+            w_h, w_h_title, u_h, u_h_title, folder + "/" + image_file)
 
-    def show_answer_module(self):
+    def show_answer_module(self, folder):
         # weight visualization of answer module
         if self.answer_module == 'recurrent':
             w_z = self.W_ans_upd_in.get_value()
@@ -606,24 +609,31 @@ class DAM:
                         "U(r_{t}\odot h_{t-1})+b^{(h)})$\n $W$"
             u_h_title = "$Hidden: $\n $\\tilde{h}_{t} = \\tanh(Wx_{t}+" \
                         "U(r_{t}\odot h_{t-1})+b^{(h)})$\n $U$"
-            show(w_z, w_z_title, u_z, u_z_title, w_r, w_r_title, u_r, u_r_title,
-                 w_h, w_h_title, u_h, u_h_title)
+            image_file = "answer_module_gru.pdf"
+            show_gru_weight(
+                w_z, w_z_title, u_z, u_z_title,
+                w_r, w_r_title, u_r, u_r_title,
+                w_h, w_h_title, u_h, u_h_title, folder + "/" + image_file)
 
         w = self.W_a.get_value()
-        show_weight_matrix.show(w, "$Last\ layer: Feedforward\ Nets$")
+        image_file = "answer_module_mlp.pdf"
+        show_weight(w, "$Last\ layer: Feedforward\ Nets$", folder + "/" + image_file)
 
-    def show_attention_weight(self):
+    def show_attention_weight(self, folder):
         w_1 = self.W_1.get_value()
         w_2 = self.W_2.get_value()
-        w_1_title = "$First\ layer\ of\ MLP: $\n $h^{(1)} = \\tanh(W^{(1)}x+b^{(1)})$\n $W^{(1)}$"
-        w_2_title = "$Last\ layer\ of\ MLP: $\n $h^{(2)} = \sigma(W^{(2)}h^{(1)}+b^{(2)})$\n $W^{(2)}$"
-        show_attention_weight.show(w_1, w_1_title, w_2, w_2_title)
+        w_1_title = "$First\ layer\ of\ MLP: $\n $h^{(1)} = \\tanh(W^{(1)}x" \
+                    "+b^{(1)})$\n $W^{(1)}$"
+        w_2_title = "$Last\ layer\ of\ MLP: $\n $h^{(2)} = \sigma(W^{(2)}" \
+                    "h^{(1)}+b^{(2)})$\n $W^{(2)}$"
+        image_file = "attention.pdf"
+        show_attention_weight(w_1, w_1_title, w_2, w_2_title, folder + "/" + image_file)
 
-    def show_weight(self):
-        self.show_input_module()
-        self.show_memory_module()
-        self.show_answer_module()
-        self.show_attention_weight()
+    def show_weight(self, folder):
+        self.show_input_module(folder)
+        self.show_memory_module(folder)
+        self.show_answer_module(folder)
+        self.show_attention_weight(folder)
 
     def print_weight(self):
         self.print_input_module()
