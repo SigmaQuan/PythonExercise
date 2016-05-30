@@ -6,7 +6,7 @@ import time
 
 import word
 from hyperparameter import HyperParameterSpace
-from task_training import TrainOneTask
+from babi_task_training import TrainOneTask
 
 from hyperparameter import HyperParameterSpace
 from babi_task_testing import TestOneTask

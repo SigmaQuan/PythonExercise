@@ -122,7 +122,7 @@ class HyperParameterSpace:
                             help='number of epochs')
         parser.add_argument('--load_state', type=str, default="",
                             help='state file path')
-        parser.add_argument('--answer_module', type=str, default="recurrent",
+        parser.add_argument('--answer_module', type=str, default="feedforward",
                             help='answer module type: feedforward or recurrent')
         parser.add_argument('--mode', type=str, default="train",
                             help='mode: train or test. Test mode required load_state')

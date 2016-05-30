@@ -4,7 +4,7 @@ import time
 
 import word
 from hyperparameter import HyperParameterSpace
-from task_training import TrainOneTask
+from babi_task_training import TrainOneTask
 
 print "==> get one argument for each task"
 hyper_parameter = HyperParameterSpace()

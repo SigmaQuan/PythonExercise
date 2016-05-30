@@ -47,10 +47,12 @@ class TrainOneTask:
     # init class
     def set_dam(self):
         if self.args.network == 'dmn_batch':
-            import dam
-            return dam.DAM(**self.args_dict)
+            # import dam
+            # return dam.DAM(**self.args_dict)
             # import dam_new
             # return dam_new.DAM(**self.args_dict)
+            import dam_refactor
+            return dam_refactor.DAM(**self.args_dict)
         # elif self.args.network == 'dmn_basic':
         #     import dmn_basic
         #     if (self.args.batch_size != 1):
@@ -217,7 +219,7 @@ class TrainOneTask:
             self.dump_args2json_file(json_file_path)
 
         elif self.args.mode == 'test':
-            self.dump_args2json_file(self.folder_name + 'last_tested_model.json')
+            self.dump_args2json_file(self.folder_name + '/last_tested_model.json')
             self.do_epoch('test', 0)
 
         else:
