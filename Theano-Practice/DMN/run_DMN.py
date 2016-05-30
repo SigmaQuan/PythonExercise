@@ -329,7 +329,7 @@ val_fn = theano.function([dmn.input_var,
 
 # We iterate over epochs:
 print("# We iterate over epochs:")
-num_epochs = 1
+num_epochs = 0
 epoch_pretraining = 0
 
 batch_size=50
