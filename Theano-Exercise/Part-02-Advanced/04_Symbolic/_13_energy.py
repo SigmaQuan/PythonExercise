@@ -34,8 +34,8 @@ def grad_expected_energy(W, V, H):
     :return: a theano matrix dW, element i,j are the gradient of W.
     """
     # return tensor.grad(energy(W, V, H), W)
-    # return tensor.grad(energy(W, V, H).mean(), W, consider_constant=[V, H])
-    return tensor.grad(cost=energy(W, V, H).mean(), wrt=W, consider_constant=[V, H])
+    return tensor.grad(energy(W, V, H).mean(), W, consider_constant=[V, H])
+    # return tensor.grad(cost=energy(W, V, H).mean(), wrt=W, consider_constant=[V, H])
 
 
 if __name__ == "__main__":
