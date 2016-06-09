@@ -279,8 +279,8 @@ def show_attention_weight(w_1, w_1_title, w_2, w_2_title, image_file):
     axes_w_2.set_xticks([])
     axes_w_2.set_yticks([])
     matrix_size = "$:\ %d \\times\ %d$" % (len(w_2[0]), len(w_2))
-    w_1_title += matrix_size
-    axes_w_2.set_title(w_1_title)
+    w_2_title += matrix_size
+    axes_w_2.set_title(w_2_title)
 
     # plt.tight_layout()
 
@@ -294,5 +294,4 @@ def show_attention_weight(w_1, w_1_title, w_2, w_2_title, image_file):
 
     # close plot GUI
     plt.close()
-
 

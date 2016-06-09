@@ -582,7 +582,7 @@ class DAM:
                     "U(r_{t}\odot h_{t-1})+b^{(h)})$\n $W$"
         u_h_title = "$Hidden: $\n $\\tilde{h}_{t} = \\tanh(Wx_{t}+" \
                     "U(r_{t}\odot h_{t-1})+b^{(h)})$\n $U$"
-        image_file = "input_module_gru.pdf"
+        image_file = "memory_module_gru.pdf"
         show_gru_weight(
             w_z, w_z_title, u_z, u_z_title,
             w_r, w_r_title, u_r, u_r_title,
@@ -617,9 +617,9 @@ class DAM:
 
         w = self.W_a.get_value()
         image_file = "answer_module_mlp.pdf"
-        show_weight(w, "$Last\ layer: Feedforward\ Nets$", folder + "/" + image_file)
+        show_weight(w, "$One Layer Weights$", folder + "/" + image_file)
 
-    def show_attention_weight(self, folder):
+    def show_attention_module(self, folder):
         w_1 = self.W_1.get_value()
         w_2 = self.W_2.get_value()
         w_1_title = "$First\ layer\ of\ MLP: $\n $h^{(1)} = \\tanh(W^{(1)}x" \
@@ -633,7 +633,7 @@ class DAM:
         self.show_input_module(folder)
         self.show_memory_module(folder)
         self.show_answer_module(folder)
-        self.show_attention_weight(folder)
+        self.show_attention_module(folder)
 
     def print_weight(self):
         self.print_input_module()
