@@ -16,7 +16,8 @@ arg_list = hyper_parameter.produce_arg_list_by_tasks()
 
 # load word vector: glove
 # word2vec = utils.load_glove(arg_list[0].word_vector_size)
-word2vec = word.load_glove(arg_list[0].word_vector_size)
+# golve_folder = "/media/qzb/Engineering/5.Coding/0.Data/glove/glove/"
+word2vec = word.load_glove(arg_list[0].glove_folder, arg_list[0].word_vector_size)
 # babi_train_raw, babi_test_raw = babi.get_raw("1", "1")
 
 print "==> training each task.."

@@ -17,7 +17,9 @@ class TrainOneTask:
         self.network_name = self.set_network_name()
         # get data of the task
         self.babi_train_raw, self.babi_test_raw = babi.get_raw(
-            self.args.babi_id, self.args.babi_test_id)
+            self.args.babi_folder,
+            self.args.babi_id,
+            self.args.babi_test_id)
         self.args_dict = dict(self.args._get_kwargs())
         print self.args_dict
         self.args_dict['babi_train_raw'] = self.babi_train_raw

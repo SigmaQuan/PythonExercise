@@ -2,11 +2,13 @@ import os as os
 import numpy as np
 
 
-def load_glove(dim):
+def load_glove(folder, dim):
     word2vec = {}
     print "==> loading glove"
-    with open(os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                           "data/glove/glove.6B." + str(dim) + "d.txt")) as f:
+    # with open(os.path.join(os.path.dirname(os.path.realpath(__file__)),
+    #                        "data/glove/glove.6B." + str(dim) + "d.txt")) as f:
+    with open(os.path.join(folder,
+                           "glove.6B." + str(dim) + "d.txt")) as f:
         for line in f:
             l = line.split()
             word2vec[l[0]] = map(float, l[1:])

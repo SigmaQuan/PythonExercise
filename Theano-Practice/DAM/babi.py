@@ -39,7 +39,7 @@ def get_one_file_data(file_name):
     return tasks
 
 
-def get_raw(train_id, test_id):
+def get_raw(folder, train_id, test_id):
     """
     Get babi training and testing data by task id.
     :param train_id: task id for training.
@@ -94,10 +94,14 @@ def get_raw(train_id, test_id):
         test_id = train_id
     babi_train_file_name = babi_map[train_id]
     babi_test_file_name = babi_map[test_id]
+    # babi_train_raw = get_one_file_data(
+    #     os.path.join(os.path.dirname(os.path.realpath(__file__)),
+    #                  'data/en/%s_train.txt' % babi_train_file_name))
+    # babi_test_raw = get_one_file_data(
+    #     os.path.join(os.path.dirname(os.path.realpath(__file__)),
+    #                  'data/en/%s_test.txt' % babi_test_file_name))
     babi_train_raw = get_one_file_data(
-        os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                     'data/en/%s_train.txt' % babi_train_file_name))
+        os.path.join(folder, 'en/%s_train.txt' % babi_train_file_name))
     babi_test_raw = get_one_file_data(
-        os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                     'data/en/%s_test.txt' % babi_test_file_name))
+        os.path.join(folder, 'en/%s_test.txt' % babi_test_file_name))
     return babi_train_raw, babi_test_raw

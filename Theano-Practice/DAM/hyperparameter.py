@@ -1,6 +1,9 @@
 import argparse
 
 
+_golve_folder = "/media/qzb/Engineering/5.Coding/0.Data/glove/glove/"
+_babi_folder = "/media/qzb/Engineering/5.Coding/0.Data/bAbI/tasks_1-20_v1-2/"
+
 class HyperParameterSpace:
     def __init__(self):
         self.network = ["dmn_batch", "dmn_basic", "dmn_smooth", "dmn_qa"]
@@ -25,6 +28,8 @@ class HyperParameterSpace:
         self.babi_test_id = ""
         self.dropout = [0, 0.1, 0.3, 0.5]
         self.batch_norm = False
+        self.babi_folder = _babi_folder
+        self.glove_folder = _golve_folder
 
     def cout(self):
         print "network name"
@@ -67,6 +72,10 @@ class HyperParameterSpace:
         print self.dropout
         print "batch normalization"
         print self.batch_norm
+        print "babi folder"
+        print self.babi_folder
+        print "glove folder"
+        print self.glove_folder
 
     def produce_one_arg(self):
         # parser = argparse.ArgumentParser()
@@ -151,6 +160,10 @@ class HyperParameterSpace:
                             help='dropout rate (between 0 and 1)')
         parser.add_argument('--batch_norm', type=bool, default=False,
                             help='batch normalization')
+        parser.add_argument('--babi_folder', type=str, default=_babi_folder,
+                            help='the folder of babi dataset')
+        parser.add_argument('--glove_folder', type=str, default=_golve_folder,
+                            help='the folder of glove')
         parser.set_defaults(shuffle=True)
         return parser.parse_args()
 
