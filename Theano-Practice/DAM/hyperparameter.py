@@ -1,8 +1,10 @@
 import argparse
 
 
-_golve_folder = "/media/qzb/Engineering/5.Coding/0.Data/glove/glove/"
-_babi_folder = "/media/qzb/Engineering/5.Coding/0.Data/bAbI/tasks_1-20_v1-2/"
+_golve_folder = "/home/qzb/Documents/Coding/Data/glove/glove/"
+_babi_folder = "/home/qzb/Documents/Coding/Data/bAbI/tasks_1-20_v1-2/"
+# _golve_folder = "/media/qzb/Engineering/5.Coding/0.Data/glove/glove/"
+# _babi_folder = "/media/qzb/Engineering/5.Coding/0.Data/bAbI/tasks_1-20_v1-2/"
 
 class HyperParameterSpace:
     def __init__(self):
