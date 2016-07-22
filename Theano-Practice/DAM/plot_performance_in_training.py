@@ -68,3 +68,8 @@ def dynamic_show_2():
 
     while True:
         plt.pause(0.05)
+
+
+# if __name__ == "__main__":
+#     dynamic_show_1()
+#     dynamic_show_2()
