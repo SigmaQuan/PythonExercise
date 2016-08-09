@@ -223,6 +223,7 @@ class TrainOneTask:
         else:
             raise Exception("unknown mode")
 
+
     def dump_args2json_file(self, file_path):
         file = open(file_path, 'w+')
         data = dict(self.args._get_kwargs())
